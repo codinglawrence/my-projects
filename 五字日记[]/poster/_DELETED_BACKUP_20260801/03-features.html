@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<title>五字日记 · 功能亮点</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing:antialiased; user-select:none; }
+html, body { width:1080px; height:1440px; overflow:hidden; }
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  background: linear-gradient(165deg, #fff9f2 0%, #ffefe6 35%, #ffe4d6 72%, #ffd6c4 100%);
+  color: #4a3528;
+  position: relative;
+}
+.bg-blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+.blob-1 { width: 440px; height: 440px; background: #ffc8b0; top: -100px; left: -80px; opacity: .34; }
+.blob-2 { width: 420px; height: 420px; background: #ffe0b3; bottom: -120px; right: -80px; opacity: .34; }
+.poster { position: relative; width: 100%; height: 100%; z-index: 1; }
+.header { text-align: center; padding-top: 74px; }
+.header h2 { font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif; font-size: 64px; font-weight: 600; letter-spacing: 8px; color: #4a3528; }
+.header p { font-size: 24px; color: #8b6b55; margin-top: 14px; letter-spacing: 3px; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; width: 860px; margin: 58px auto 0; }
+.card { background: rgba(255,255,255,0.66); border: 1px solid rgba(200,168,124,0.22); border-radius: 28px; padding: 32px 28px; box-shadow: 0 14px 40px rgba(74,45,30,0.06); }
+.card-top { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.icon { width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, #f9e9d8, #f4dec6); display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6b4f3d; }
+.card h3 { font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif; font-size: 30px; color: #4a3528; letter-spacing: 2px; }
+.card p { font-size: 21px; color: #7a5d4a; line-height: 1.6; }
+.phone-row { display: flex; justify-content: center; gap: 40px; margin-top: 46px; }
+.phone { width: 196px; padding: 9px; background: #fff; border-radius: 34px; box-shadow: 0 22px 60px rgba(74, 45, 30, 0.14), 0 8px 20px rgba(74, 45, 30, 0.07); }
+.phone-screen { width: 178px; height: 384px; border-radius: 28px; overflow: hidden; background: #faf8f6; }
+.phone-screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.phone:nth-child(2) .phone-screen img { filter: blur(1.1px); }
+.bottom { text-align: center; margin-top: 48px; }
+.bottom .cta { font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif; font-size: 38px; font-weight: 600; letter-spacing: 2px; color: #4a3528; }
+.bottom .hashtags { font-size: 20px; color: #b08d75; margin-top: 14px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="poster">
+    <div class="header">
+      <h2>它远不止记日记</h2>
+      <p>四个小心思，把记录变得像呼吸一样自然</p>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-top"><div class="icon">五</div><h3>5 字极简</h3></div>
+        <p>强迫自己只写五个字，告别长篇焦虑，先写起来再说。</p>
+      </div>
+      <div class="card">
+        <div class="card-top"><div class="icon">☺</div><h3>心情评分</h3></div>
+        <p>0-10 分 + 大表情，颜色会替你记住那天的情绪。</p>
+      </div>
+      <div class="card">
+        <div class="card-top"><div class="icon">◷</div><h3>历史回看</h3></div>
+        <p>按时间线翻看，像翻自己的朋友圈，低落时也能看见光。</p>
+      </div>
+      <div class="card">
+        <div class="card-top"><div class="icon">◈</div><h3>补记随心</h3></div>
+        <p>日历选任意日期，昨天漏记、上周忘记，都能补回来。</p>
+      </div>
+    </div>
+    <div class="phone-row">
+      <div class="phone"><div class="phone-screen"><img src="../poster-assets/home.png" alt="home"></div></div>
+      <div class="phone"><div class="phone-screen"><img src="../poster-assets/history.png" alt="history"></div></div>
+    </div>
+    <div class="bottom">
+      <div class="cta">把功能，做成没有负担</div>
+      <div class="hashtags">#效率工具 &nbsp; #日记app &nbsp; #极简生活</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+/* pages/collection/collection.wxss — 鎏金主题 · coverflow 旋转木马 */
+.page { padding: 28rpx 0 60rpx; }
+.empty { text-align: center; color: var(--ink-soft); font-size: 28rpx; margin-top: 120rpx; padding: 0 48rpx; line-height: 1.7; }
+
+.ring-hint { text-align: center; font-size: 24rpx; margin: 16rpx 0 8rpx; letter-spacing: 1rpx; }
+.ring { height: 820rpx; }
+.ring-item { display: flex; align-items: center; justify-content: center; }
+
+/* 卡面：锁金卡牌图像直接铺满；两侧收窄卡缩小 + 半透明，营造环形纵深（参考2 远近层次） */
+.ring-card {
+  width: 520rpx;
+  height: 700rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  position: relative;
+  background: #1c100c;
+  isolation: isolate;  /* 限制箔层 color-dodge 混合范围在卡内，不外溢到页面 */
+  transform: scale(0.84);
+  opacity: 0.6;
+  transition: transform 0.4s var(--ease-depth), opacity 0.4s ease;
+  box-shadow: var(--shadow-depth);
+}
+.ring-card.active { transform: scale(1); opacity: 1; }
+.rc-img { width: 100%; height: 100%; display: block; }
+/* 箔层：夹在 rc-img(z 默认) 与 rc-img-fg(z2) 之间，z-index:1，fg 永远最高 → 箔绝不遮文字/符号 */
+.rc-foil-layer {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border-radius: 28rpx;
+  pointer-events: none;
+  z-index: 1;
+  background-size: 300% 300%;
+  background-repeat: no-repeat;
+}
+.rc-foil-layer.idleFoil { animation: rcIdleFoil 7s ease-in-out infinite; }
+.rc-foil-layer.flow { animation: rcFlow 7s ease-in-out infinite; }
+.rc-foil-layer.twinkle { animation: rcTwinkle 5s ease-in-out infinite; }
+@keyframes rcIdleFoil {
+  0%, 100% { background-position: 50% 50%; }
+  50%      { background-position: 100% 100%; }
+}
+@keyframes rcFlow {
+  0%, 100% { transform: translate(0%, 0%) scale(1); }
+  50%      { transform: translate(3%, -2%) scale(1.05); }
+}
+@keyframes rcTwinkle {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 0.45; }
+}
+.rc-img-fg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+
+/* 笔记浮层（底部羊皮纸金字，半透酒红底） */
+.rc-note {
+  position: absolute; left: 0; right: 0; bottom: 64rpx;
+  background: linear-gradient(to top, rgba(17, 9, 5, 0.9), rgba(17, 9, 5, 0));
+  padding: 28rpx 28rpx 16rpx;
+  box-sizing: border-box;
+}
+.note-label { font-size: 22rpx; color: var(--gold-bright); margin-right: 12rpx; }
+.note-text { font-size: 26rpx; color: var(--ink); line-height: 1.5; }
+
+/* 编辑笔记按钮（底部金条） */
+.rc-edit {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 60rpx; display: flex; align-items: center; justify-content: center;
+  font-size: 24rpx; color: var(--gold-bright);
+  background: linear-gradient(to top, rgba(17, 9, 5, 0.86), rgba(17, 9, 5, 0));
+  letter-spacing: 1rpx;
+}
+
+/* 清除全部数据按钮（页面底部，危险操作红色描边） */
+.reset-all {
+  margin: 40rpx auto 0;
+  width: 360rpx;
+  height: 76rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: #e64340;
+  border: 1rpx solid rgba(230, 67, 64, 0.6);
+  border-radius: 38rpx;
+  letter-spacing: 2rpx;
+  background: rgba(230, 67, 64, 0.06);
+}
+.reset-all:active { background: rgba(230, 67, 64, 0.16); }

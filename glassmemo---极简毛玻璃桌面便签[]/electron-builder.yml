@@ -1,0 +1,34 @@
+appId: com.lawrence.glassmemo
+productName: GlassMemo
+copyright: Copyright (c) 2026 Lawrence
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - electron/**/*
+  - dist/**/*
+  - package.json
+
+# 原生模块（koffi）通过 createRequire 加载 .node 二进制，跨 asar 边界会解析失败
+# （Electron asar 完整性校验下，asar 内 JS require 被解包的 .node 会报 Cannot find module）。
+# 关闭 asar 打包，让 koffi 主包与 @koromix/*.node 位于同一真实目录，从根上规避。
+# electron-builder 会按 dependencies（koffi）自动打包其 node_modules，无需在 files 里显式列。
+asar: false
+
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: GlassMemo
+  artifactName: GlassMemo-Setup-${version}.exe

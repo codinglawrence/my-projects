@@ -1,0 +1,235 @@
+/* pages/index/index.wxss — 鎏金主题 · 牌堆居中 + 抽卡遮罩 */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 32rpx 48rpx;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* 已抽卡牌带：牌堆正上方，横向滚动，内容不消失 */
+.drawn-strip {
+  width: 100%;
+  height: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+.strip-scroll {
+  width: 100%;
+  height: 100%;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+.strip-card {
+  position: relative;
+  display: inline-block;
+  width: 120rpx;
+  height: 168rpx;
+  margin-right: 16rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 10rpx 22rpx rgba(0, 0, 0, 0.45);
+  animation: stripIn 0.45s var(--ease-expo) both;
+  vertical-align: middle;
+}
+.strip-card:first-child { margin-left: 32rpx; }
+.strip-card:last-child { margin-right: 32rpx; }
+.strip-img {
+  width: 100%; height: 100%;
+  border-radius: 16rpx;
+  display: block;
+  border: 2rpx solid rgba(201, 162, 39, 0.35);
+  box-sizing: border-box;
+}
+.strip-img-fg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border-radius: 16rpx;
+  display: block;
+  pointer-events: none;
+  z-index: 2;
+}
+/* 抽卡条缩略图轻量箔层（省性能：单层紫金渐变，不铺程序化纹理）。
+   夹在 strip-img(z 默认) 与 strip-img-fg(z2) 之间，fg 永远最高 → 绝不遮文字/符号。 */
+.strip-foil {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border-radius: 16rpx;
+  pointer-events: none;
+  z-index: 1;
+  background-image: linear-gradient(115deg, transparent 0%, rgba(185,140,255,0.5) 25%, transparent 47%, transparent 53%, rgba(232,206,122,0.5) 75%, transparent 100%);
+  background-size: 300% 300%;
+  background-repeat: no-repeat;
+  opacity: 0.12;
+  animation: stripFoil 7s ease-in-out infinite;
+}
+@keyframes stripFoil {
+  0%, 100% { background-position: 50% 50%; }
+  50%      { background-position: 100% 100%; }
+}
+.strip-fav {
+  position: absolute;
+  right: 6rpx; top: 6rpx;
+  font-size: 22rpx;
+  color: #E8CE7A;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.6);
+}
+.strip-placeholder {
+  color: var(--ink-soft);
+  font-size: 24rpx;
+  letter-spacing: 2rpx;
+  text-align: center;
+}
+@keyframes stripIn {
+  0%   { opacity: 0; transform: translateY(-30rpx) scale(0.86); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 牌堆：页面视觉中心，宽度约占屏幕 70% */
+.deck-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  width: 100%;
+}
+.deck {
+  position: relative;
+  width: 420rpx;
+  height: 588rpx;
+}
+.deck-card {
+  position: absolute; left: 0; top: 0;
+  width: 420rpx; height: 588rpx; border-radius: 28rpx;
+  background: linear-gradient(135deg, #16102A 0%, #0d0820 55%, #070411 100%);
+  box-shadow: 0 28rpx 60rpx rgba(0, 0, 0, 0.55);
+  border: 3rpx solid rgba(185, 140, 255, 0.48);
+}
+.deck-card:nth-child(1) { transform: translateY(0) rotate(-4deg); }
+.deck-card:nth-child(2) { transform: translateY(-10rpx) rotate(2deg); }
+.deck-card:nth-child(3) { transform: translateY(-20rpx) rotate(-1deg); }
+.deck-card::after {
+  content: '';
+  position: absolute; inset: 16rpx;
+  border-radius: 18rpx;
+  border: 2rpx solid rgba(185, 140, 255, 0.3);
+  pointer-events: none;
+}
+.deck-logo {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 120rpx; height: 120rpx;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 4rpx solid rgba(185, 140, 255, 0.6);
+  color: var(--gold-bright);
+  font-size: 72rpx; font-weight: 700; line-height: 1;
+  background: rgba(185, 140, 255, 0.14);
+  text-shadow: 0 4rpx 16rpx rgba(185, 140, 255, 0.45);
+  pointer-events: none;
+}
+.deck.shuffling { animation: shuffle 0.5s ease-in-out infinite; }
+@keyframes shuffle {
+  0%   { transform: rotate(-5deg) translateY(0); }
+  25%  { transform: rotate(5deg) translateY(-12rpx); }
+  50%  { transform: rotate(-3deg) translateY(0); }
+  75%  { transform: rotate(4deg) translateY(-8rpx); }
+  100% { transform: rotate(-5deg) translateY(0); }
+}
+.deck-tip { margin-top: 28rpx; font-size: 26rpx; color: var(--ink-soft); letter-spacing: 2rpx; }
+
+/* 底部 */
+.actions { width: 100%; display: flex; gap: 24rpx; margin-top: 24rpx; }
+.actions .ai-btn { flex: 1; }
+
+/* 抽卡遮罩：深色玻璃，卡牌从中心翻转出现 */
+.draw-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(7, 4, 17, 0.84);
+  backdrop-filter: blur(4rpx);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+  animation: maskIn 0.25s ease both;
+}
+@keyframes maskIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+.draw-mask.closing { animation: maskOut 0.25s ease forwards; }
+@keyframes maskOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+.draw-sheet {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 0;
+  box-sizing: border-box;
+}
+.draw-mask.closing .draw-sheet { animation: sheetOut 0.25s ease forwards; }
+@keyframes sheetOut {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.92); }
+}
+
+/* 遮罩内 swiper：横向轮播浏览多张卡牌 */
+.draw-swiper {
+  width: 100%;
+  height: 760rpx;
+}
+.card-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.draw-slot {
+  width: 520rpx;
+  height: 728rpx;
+}
+/* 翻转入场：720° 双圈翻转后定格中央（抽卡登场动画）。
+   时长 1.1s 让双圈翻转看得清；期间 flip-card 的重力倾斜(tiltPaused)归零，不干扰定格。 */
+.draw-slot.deal-in { animation: overlayDealIn 1.1s var(--ease-expo) both; }
+@keyframes overlayDealIn {
+  0%   { opacity: 0; transform: perspective(1000rpx) rotateY(-720deg) translateY(60rpx) scale(0.6); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: perspective(1000rpx) rotateY(0deg) translateY(0) scale(1); }
+}
+.draw-hint {
+  margin-top: 28rpx;
+  font-size: 24rpx;
+  color: var(--ink-soft);
+  letter-spacing: 2rpx;
+}
+
+/* 笔记半屏（鎏金暗色） */
+.note-mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.55); display: flex; align-items: flex-end; z-index: 100; }
+.note-sheet { width: 100%; background: #1c100c; border-radius: 28rpx 28rpx 0 0; padding: 40rpx 32rpx; box-sizing: border-box; border-top: 2rpx solid rgba(201, 162, 39, 0.4); }
+.note-title { font-size: 32rpx; font-weight: 600; color: var(--gold-bright); }
+.note-input { width: 100%; height: 300rpx; margin: 24rpx 0; padding: 24rpx; box-sizing: border-box; background: #140d09; color: var(--ink); border-radius: 16rpx; font-size: 28rpx; border: 1rpx solid rgba(201, 162, 39, 0.2); }
+.note-btns { display: flex; gap: 24rpx; }
+.note-btns .ai-btn { flex: 1; }
+
+/* 小屏适配：卡牌遮罩适当缩小 */
+@media (max-height: 720rpx) {
+  .draw-slot { width: 420rpx; height: 588rpx; }
+  .draw-swiper { height: 620rpx; }
+  .deck { width: 340rpx; height: 476rpx; }
+  .deck-card { width: 340rpx; height: 476rpx; }
+}

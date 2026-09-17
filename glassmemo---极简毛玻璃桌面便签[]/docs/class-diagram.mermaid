@@ -1,0 +1,166 @@
+classDiagram
+  direction LR
+
+  class BrowserWindow {
+    +getNativeWindowHandle() Buffer
+    +setAlwaysOnTop(flag: boolean, level?: string) void
+    +show() void
+    +hide() void
+    +focus() void
+    +once(event: 'ready-to-show', cb: Function) void
+    +on(event: 'close', cb: Function) void
+    +webContents: WebContents
+  }
+
+  class WebContents {
+    +send(channel: string, payload: any) void
+  }
+
+  class App {
+    +whenReady() Promise~void~
+    +setLoginItemSettings(opts: object) void
+    +quit() void
+  }
+
+  class LayerController {
+    -win: BrowserWindow
+    -pinned: boolean
+    -lastMode: Mode
+    -desktop: DesktopLayerBridge
+    +applyLayer(opts?: ApplyLayerOptions) Promise~AttachResult~
+    +togglePin() Promise~AttachResult~
+    +getMode() Mode
+    +getPinned() boolean
+  }
+
+  class DesktopLayerBridge {
+    <<interface>>
+    +findDesktopWorkerW() bigint
+    +attachToDesktop(hwndBuffer: Buffer) AttachResult
+    +detachFromDesktop(hwndBuffer: Buffer) AttachResult
+  }
+
+  class KoffiDesktopLayer {
+    -findWindowW: Function
+    -findWindowExW: Function
+    -sendMessageTimeoutW: Function
+    -setParent: Function
+    -getClassNameW: Function
+    +findDesktopWorkerW() bigint
+    +attachToDesktop(hwndBuffer: Buffer) AttachResult
+    +detachFromDesktop(hwndBuffer: Buffer) AttachResult
+    -validateHwndBuffer(h: Buffer) void
+    -wrapPointer(buf: Buffer) pointer
+  }
+
+  class IpcBridge {
+    <<interface>>
+    +pin: PinApi
+  }
+
+  class PinApi {
+    <<interface>>
+    +toggle() Promise~AttachResult~
+    +get() Promise~PinState~
+    +onChange(cb: Function) UnsubscribeFn
+  }
+
+  class PreloadBridge {
+    +contextBridge.exposeInMainWorld('glassmemo', ipcBridge)
+    +ipcRenderer.invoke('pin:toggle') Promise~AttachResult~
+    +ipcRenderer.invoke('pin:get') Promise~PinState~
+    +ipcRenderer.on('pin:change', cb) UnsubscribeFn
+  }
+
+  class PinToggleRequest {
+    +source: 'tray' | 'ui-button'
+    +expectedPinned: boolean
+  }
+
+  class AttachResult {
+    +ok: boolean
+    +mode: Mode
+    +reason: string
+  }
+
+  class PinState {
+    +pinned: boolean
+    +mode: Mode
+  }
+
+  class Mode {
+    <<enumeration>>
+    desktop-widget
+    pinned-floating
+    normal-fallback
+  }
+
+  class TrayMenu {
+    -tray: Tray
+    -menuItems: TrayMenuItem[]
+    -layer: LayerController
+    +build() Menu
+    +refreshTooltip(mode: Mode) void
+    +syncPinCheckbox(pinned: boolean) void
+    +onClick(id: string) void
+  }
+
+  class TrayMenuItem {
+    +id: string
+    +label: string
+    +type: 'normal' | 'checkbox'
+    +checked: boolean
+    +enabled: boolean
+  }
+
+  class ReactPinToggleButton {
+    +onClick() Promise~AttachResult~
+    -subscribePinChange(cb: Function) void
+  }
+
+  class DiagnosticScript {
+    <<utility>>
+    +enumerateProgmanChildren() WindowNode[]
+    +enumerateTopLevelWorkerW() WindowNode[]
+    +simulateAttachFailure() void
+  }
+
+  class WindowNode {
+    +hwnd: bigint
+    +className: string
+    +parentHwnd: bigint
+    +title: string
+  }
+
+  class ElectronBuilderConfig {
+    +asarUnpack: string[]
+    +files: string[]
+    +win: WinConfig
+  }
+
+  class PackageJson {
+    +dependencies: object
+    +scripts: object
+    +main: string
+  }
+
+  BrowserWindow --> WebContents : has
+  LayerController --> BrowserWindow : owns
+  LayerController --> DesktopLayerBridge : delegates
+  DesktopLayerBridge <|.. KoffiDesktopLayer : implements
+  LayerController ..> AttachResult : produces
+  LayerController ..> Mode : state
+  PinApi ..> AttachResult : returns
+  PinApi ..> PinState : returns
+  IpcBridge <|.. PreloadBridge : implements
+  PreloadBridge ..> PinToggleRequest : carries
+  ReactPinToggleButton ..> IpcBridge : consumes
+  ReactPinToggleButton ..> PinApi : invokes
+  TrayMenu --> LayerController : controls
+  TrayMenu --> TrayMenuItem : composes
+  TrayMenu ..> Mode : reads
+  DiagnosticScript ..> KoffiDesktopLayer : uses
+  DiagnosticScript ..> WindowNode : produces
+  ElectronBuilderConfig ..> KoffiDesktopLayer : enables (.node unpack)
+  PackageJson ..> KoffiDesktopLayer : declares dep
+  PackageJson ..> ElectronBuilderConfig : consumed by

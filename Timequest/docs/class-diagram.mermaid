@@ -1,0 +1,197 @@
+﻿classDiagram
+    direction TB
+
+    %% ===== Data Interfaces =====
+    class TimeEntry {
+        +string id
+        +string title
+        +Date startTime
+        +Date endTime | null
+        +number duration
+        +string category
+        +string description?
+        +number valueEvaluation?
+        +number actualValue?
+        +number aiEmpowerment?
+        +number status?
+        +number workload?
+        +string workloadUnit?
+        +Date createdAt
+        +string icon?
+        +number statusRating?
+        +number aiEnablementRating?
+    }
+
+    class ActiveTimer {
+        +string id
+        +string title
+        +Date startTime
+        +string category
+        +string description?
+        +number valueEvaluation?
+        +any icon?
+        +number pauseDuration?
+        +Date lastPauseTime? | null
+    }
+
+    class LastUsedCategory {
+        +string category
+        +string icon
+    }
+
+    class DailyReflection {
+        +string date
+        +string rating
+    }
+
+    class Insight {
+        +string type
+        +string category
+        +string icon
+        +string direction
+        +string currentLabel
+        +string compareLabel
+        +number changePercent
+        +string severity
+    }
+
+    class TimeDebtData {
+        +number year
+        +number annualIncome
+        +number hourlyRate
+        +number idealHourlyRate
+        +number idealTimeDebt
+    }
+
+    %% ===== Pinia Store =====
+    class TimerStore {
+        -Ref~ActiveTimer~ activeTimer
+        -Ref~TimeEntry[]~ timeEntries
+        -ComputedRef~number~ totalDuration
+
+        %% NEW
+        -Ref~LastUsedCategory~ lastUsedCategory
+        -Ref~string~ lastOpenDate
+        -Ref~DailyReflection[]~ dailyReflections
+        -ComputedRef~number~ todayRecordedSeconds
+        -ComputedRef~number~ todayUnrecordedSeconds
+        -ComputedRef~number~ unrecordedRatio
+
+        +startTimer(title, category, description?, icon?, valueEvaluation?, customStartTime?) void
+        +stopTimer() void
+        +pauseTimer() void
+        +resumeTimer() void
+        +addTimeEntry(entry) void
+        +removeTimeEntry(id) void
+        +updateTimeEntry(id, updates) void
+        +getTimeEntriesByDateRange(start, end) TimeEntry[]
+        +getStatsByCategory() Record~string, {totalTime, count}~
+        +getTodayTotal() number
+        +clearAllEntries() void
+
+        %% NEW
+        +recordLastOpen() void
+        +addReflection(rating) void
+        +getYesterdayEntries() TimeEntry[]
+        +getWeekEntries(offset) TimeEntry[]
+        +getMonthEntries(offset) TimeEntry[]
+    }
+
+    %% ===== Utils =====
+    class InsightsUtils {
+        +getInsights(entries, weekOffset?, monthOffset?) Insight[]
+        -computeWeeklyComparison(entries, category) Insight?
+        -computeMonthlyComparison(entries, category) Insight?
+        -filterByThreshold(insights, threshold%) Insight[]
+    }
+
+    class TimeUtils {
+        +formatTime(seconds) string
+        +formatDate(date) string
+        +formatTimeString(date) string
+        +formatDuration(seconds) string
+        +formatDateHeader(dateStr) string
+        +formatTimeRange(start, end) string
+        +getIconForCategory(category) string
+        +getCategoryColor(index) string
+        +groupEntriesByDate(entries) Record
+        +calculateTotalDuration(entries) number
+    }
+
+    %% ===== Views =====
+    class ActivityView {
+        -Ref~boolean~ showReflectionDialog
+        -ComputedRef~Insight[]~ currentInsights
+        -ComputedRef~number~ timeLeakPercent
+        -ComputedRef~number~ currentTimeValue
+        -ComputedRef~string~ currentHourlyRate
+        -handleOneClickTimer() void
+        -handleReflection(rating) void
+    }
+
+    class MoreView {
+        -Ref~number~ awakeHours
+        -handleAwakeHoursChange(value) void
+        -handleExportJSON() void
+        -showAboutDialog() void
+    }
+
+    class App {
+        -onMounted() void
+    }
+
+    class TimeDebtView {
+        -Ref~TimeDebtData[]~ savedData
+        -loadSavedData() void
+        -saveData(data) void
+    }
+
+    %% ===== Vue Router =====
+    class Router {
+        +/activity → ActivityView
+        +/history → HistoryView
+        +/category → CategoryView
+        +/timedebt → TimeDebtView
+        +/more → MoreView
+    }
+
+    %% ===== localStorage =====
+    class localStorage {
+        <<external>>
+        timeEntries
+        activeTimer
+        timeDebtData
+        timequest_config
+        timequest_last_open
+        timequest_reflections
+        timequest_last_timer
+    }
+
+    %% ===== Relationships =====
+    App --> Router : "挂载"
+    App --> TimerStore : "onMounted 触发日终检查"
+    ActivityView --> TimerStore : "useTimerStore()"
+    ActivityView --> InsightsUtils : "import getInsights"
+    ActivityView --> localStorage : "读取 timeDebtData (时薪)"
+    MoreView --> TimerStore : "useTimerStore()"
+    MoreView --> localStorage : "读写 timequest_config"
+    TimeDebtView --> localStorage : "读写 timeDebtData"
+
+    TimerStore ..> TimeEntry : "管理数组"
+    TimerStore ..> ActiveTimer : "管理单例"
+    TimerStore ..> LastUsedCategory : "持久化"
+    TimerStore ..> DailyReflection : "持久化数组"
+    TimerStore --> localStorage : "序列化/反序列化"
+
+    InsightsUtils ..> Insight : "返回数组"
+    InsightsUtils --> TimerStore : "消费 TimeEntry[]"
+    InsightsUtils --> TimeUtils : "复用格式化"
+
+    Router --> ActivityView : "路由"
+    Router --> TimeDebtView : "路由"
+    Router --> MoreView : "路由"
+
+    note for TimerStore "NEW 字段: lastUsedCategory, lastOpenDate, dailyReflections. NEW computed: unrecordedRatio. NEW actions: recordLastOpen, addReflection, getWeekEntries, getMonthEntries"
+    note for ActivityView "NEW 区域: 时间漏洞卡片(R1), 一键计时按钮(R2), 洞察卡片(R4), 时间价值行(R5), 日终反射弹窗(R3)"
+    note for MoreView "替换: 清醒时长设置 + JSON导出 (R6)"
+    note for InsightsUtils "NEW 文件: src/utils/insights.ts"

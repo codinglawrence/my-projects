@@ -1,0 +1,32 @@
+{
+  "name": "promptmaster-weapp",
+  "private": true,
+  "version": "1.0.0",
+  "description": "智能提示词管理器 - 微信小程序",
+  "scripts": {
+    "build:weapp": "taro build --type weapp",
+    "dev:weapp": "taro build --type weapp --watch",
+    "build:h5": "taro build --type h5",
+    "dev:h5": "taro build --type h5 --watch"
+  },
+  "dependencies": {
+    "@tarojs/components": "^3.6.0",
+    "@tarojs/react": "^3.6.0",
+    "@tarojs/runtime": "^3.6.0",
+    "@tarojs/taro": "^3.6.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@tarojs/cli": "^3.6.0",
+    "@tarojs/plugin-framework-react": "^3.6.0",
+    "@tarojs/plugin-html": "^3.6.0",
+    "@tarojs/plugin-platform-weapp": "^3.6.0",
+    "@tarojs/plugin-platform-h5": "^3.6.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}

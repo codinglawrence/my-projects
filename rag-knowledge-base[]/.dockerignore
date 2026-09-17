@@ -1,0 +1,26 @@
+# 依赖：绝不能把本机 node_modules / Python 缓存打进镜像。
+# 尤其 Windows 上的 node_modules 含平台原生二进制（esbuild 等），
+# 若覆盖进 Linux 镜像会导致 `npm run build` 在别的电脑上失败。
+frontend/node_modules
+**/node_modules
+**/__pycache__
+**/*.pyc
+*.pyc
+**/*.egg-info
+
+# 运行时数据：应在容器内/挂载卷里生成，绝不能进镜像
+backend/data
+**/data
+
+# 密钥：用 docker-compose env_file 或环境变量注入，不要进镜像层
+backend/.env
+
+# 测试 / 缓存 / 构建产物（多阶段构建内的 dist 不受影响）
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.coverage
+frontend/dist
+**/dist
+*.log
+.DS_Store

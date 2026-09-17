@@ -1,0 +1,107 @@
+﻿sequenceDiagram
+    actor User
+    participant App as App.vue
+    participant AV as ActivityView.vue
+    participant Store as timer Store (Pinia)
+    participant LS as localStorage
+    participant Insights as insights.ts (纯函数)
+    participant TD as timedebt.vue (数据源)
+
+    %% ===== 流程 1: 打开 App → 日终反射检查 =====
+    rect rgb(240, 245, 255)
+        Note over User,LS: 流程 1: 日终反射检查 (R3) — App onMounted
+
+        User->>App: 打开 App
+        App->>App: today = new Date().toISOString().slice(0,10)
+        App->>LS: getItem("timequest_last_open")
+        LS-->>App: "2026-07-22"
+
+        alt lastOpen ≠ today
+            App->>Store: getTimeEntriesByDateRange(yesterdayStart, todayStart)
+            Store->>LS: getItem("timeEntries")
+            LS-->>Store: [...TimeEntry]
+            Store-->>App: yesterdayEntries[]
+
+            alt yesterdayEntries.length > 0
+                App->>App: showReflectionDialog = true
+                App-->>User: 🌙 昨日回顾弹窗: "昨天记录了 X 项，共 Y 小时，感觉如何？"
+                User->>App: 点击 👍 或 👎
+                App->>Store: addReflection(rating)
+                Store->>LS: setItem("timequest_reflections", [...])
+            end
+
+            App->>Store: recordLastOpen()
+            Store->>LS: setItem("timequest_last_open", today)
+        end
+    end
+
+    %% ===== 流程 2: 用户到达 ActivityView =====
+    rect rgb(255, 248, 240)
+        Note over User,AV: 流程 2: ActivityView 渲染 — 时间漏洞卡片 + 洞察
+
+        User->>AV: 进入"活动" Tab
+        AV->>Store: computed: unrecordedRatio, todayRecordedSeconds, todayAwakeSeconds
+        Store->>LS: getItem("timequest_config") → awakeHours
+        Store-->>AV: awakeSeconds=57600, recorded=14400, unrecorded=43200, ratio=0.75
+
+        AV-->>User: 显示时间漏洞卡片: "清醒 16h · 已记录 4h · ⚠️ 12h 未记录 (75%)" [标红]
+
+        AV->>Store: timeEntries
+        Store->>LS: getItem("timeEntries")
+        LS-->>Store: [...]
+        Store-->>AV: [...TimeEntry]
+
+        AV->>Insights: getInsights(timeEntries)
+        Insights->>Insights: 按类别计算本周vs上周 + 本月vs上月
+        Insights-->>AV: [{ type:"weekly", category:"自学", changePercent:40, ... }]
+
+        alt insights.length > 0
+            AV-->>User: 显示洞察卡片: "📈 本周自学 +40% · 上周自学 8h"
+        else insights.length = 0
+            AV-->>User: (洞察区域为空，不渲染)
+        end
+    end
+
+    %% ===== 流程 3: 一键计时 =====
+    rect rgb(240, 255, 240)
+        Note over User,LS: 流程 3: 一键计时 + 时间价值显示 (R2 + R5)
+
+        User->>AV: 点击悬浮按钮 "📖 自学 一键计时"
+        AV->>Store: lastUsedCategory
+        Store->>LS: getItem("timequest_last_timer")
+        LS-->>Store: { category: "自学", icon: "📖" }
+        Store-->>AV: { category: "自学", icon: "📖" }
+
+        AV->>Store: startTimer("自学", "自学", "", "📖")
+        Store->>Store: 设置 activeTimer, 写入 localStorage
+        Store-->>AV: activeTimer 已启动
+
+        AV-->>User: 计时器圆环开始运行
+
+        loop 每秒刷新
+            AV->>TD: localStorage.getItem("timeDebtData")
+            TD-->>AV: [{ annualIncome: 300000, hourlyRate: 150, ... }]
+
+            alt hourlyRate 存在
+                AV->>AV: currentValue = hourlyRate × (elapsedSeconds / 3600)
+                AV-->>User: "时间价值 ≈ ¥150/h | 已累积 ¥186"
+            else 无年薪数据
+                AV-->>User: (不显示时间价值行)
+            end
+        end
+    end
+
+    %% ===== 流程 4: 停止计时 → 更新 lastUsedCategory =====
+    rect rgb(255, 240, 255)
+        Note over User,LS: 流程 4: 停止计时 → 持久化 lastUsedCategory
+
+        User->>AV: 点击 ⏹️ 停止
+        AV->>Store: stopTimer()
+        Store->>Store: 创建 TimeEntry, unshift 到 timeEntries
+        Store->>Store: lastUsedCategory = { category: "自学", icon: "📖" }
+        Store->>LS: setItem("timeEntries", ...)
+        Store->>LS: setItem("timequest_last_timer", { category:"自学", icon:"📖" })
+        Store->>LS: removeItem("activeTimer")
+
+        AV-->>User: 计时器清空，悬浮按钮更新为 "📖 自学 一键计时"
+    end

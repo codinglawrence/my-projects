@@ -1,0 +1,81 @@
+<!-- pages/index/index.wxml -->
+<view class="page">
+
+  <!-- 已抽卡牌带：关闭遮罩后，卡牌回到牌堆正上方，内容不消失 -->
+  <view class="drawn-strip">
+    <scroll-view wx:if="{{hand.length > 0}}" class="strip-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view wx:for="{{hand}}" wx:key="index"
+            class="strip-card {{item.flipped ? 'flipped' : ''}}"
+            bindtap="onStripTap"
+            data-index="{{index}}"
+            style="animation-delay:{{index * 80}}ms">
+        <image wx:if="{{!item.flipped}}" class="strip-img" src="{{item.card.artFrontBg}}" mode="aspectFill" />
+        <image wx:if="{{item.flipped}}" class="strip-img" src="{{item.card.artBackBg}}" mode="aspectFill" />
+        <view class="strip-foil"></view>
+        <image wx:if="{{!item.flipped}}" class="strip-img-fg" src="{{item.card.artFrontFg}}" mode="aspectFill" />
+        <image wx:if="{{item.flipped}}" class="strip-img-fg" src="{{item.card.artBackFg}}" mode="aspectFill" />
+        <view wx:if="{{item.favorited}}" class="strip-fav">★</view>
+      </view>
+    </scroll-view>
+    <view wx:else class="strip-placeholder">
+      <text>抽出的卡会落在这里</text>
+    </view>
+  </view>
+
+  <!-- 牌堆：页面视觉中心，占主体 -->
+  <view class="deck-area">
+    <view class="deck {{isDrawing ? 'shuffling' : ''}}" bindtap="drawSingle">
+      <view class="deck-card"></view>
+      <view class="deck-card"></view>
+      <view class="deck-card"></view>
+      <view class="deck-logo" aria-hidden="true">?</view>
+    </view>
+    <text class="deck-tip soft">{{isDrawing ? '正在洗牌…' : '余 ' + remaining + ' 张'}}</text>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="actions">
+    <button class="ai-btn" bindtap="drawSingle">抽一张</button>
+    <button class="ai-btn ghost" bindtap="drawTriple">连续抽 3 张</button>
+  </view>
+
+  <!-- 抽卡遮罩：点空白处按当前模式返回（滚筒→主界面 / 聚焦→滚筒 / 单抽→主界面） -->
+  <view wx:if="{{showOverlay}}" class="draw-mask {{closing ? 'closing' : ''}}" bindtap="onOverlayBlank">
+    <view class="draw-sheet">
+
+      <!-- 模式 A：滚筒轮播（连续抽 3 张）。点卡片→放大聚焦；点空白→返回主界面 -->
+      <block wx:if="{{overlayMode === 'drum'}}">
+        <drum-carousel cards="{{drumCards}}" running="{{drumRunning}}" bind:select="onDrumSelect" />
+      </block>
+
+      <!-- 模式 B/C：单张放大详情（单抽 或 从滚筒点入）。点空白→返回滚筒或主界面 -->
+      <block wx:else>
+        <view class="draw-slot deal-in" catchtap="noop">
+          <flip-card card="{{focusCard.card}}"
+                     flipped="{{focusCard.flipped}}"
+                     favorited="{{focusCard.favorited}}"
+                     tiltPaused="{{dealPaused}}"
+                     bind:toggle="onFocusToggle"
+                     bind:fav="onFocusFav"
+                     bind:note="onOpenNote"
+                     data-index="{{focusIndex}}" />
+        </view>
+        <text class="draw-hint">{{fromDrum ? '点空白处返回滚筒' : '点空白处收回'}}</text>
+      </block>
+
+    </view>
+  </view>
+
+  <!-- 笔记半屏编辑 -->
+  <view wx:if="{{showNote}}" class="note-mask" bindtap="closeNote">
+    <view class="note-sheet" catchtap="noop">
+      <text class="note-title">我的思考</text>
+      <textarea class="note-input" value="{{noteText}}" bindinput="onNoteInput"
+                placeholder="写下你对这个问题的真实想法…" maxlength="2000" />
+      <view class="note-btns">
+        <button class="ai-btn ghost" bindtap="closeNote">取消</button>
+        <button class="ai-btn" bindtap="saveNote">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

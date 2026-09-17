@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Gesture Particle Forge · 手势粒子熔炉</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 粒子主画布 -->
+  <canvas id="stage"></canvas>
+
+  <!-- 顶部栏：标题 + 实时状态 + FPS -->
+  <header class="topbar">
+    <div class="brand">
+      <h1 id="title">GESTURE PARTICLE FORGE</h1>
+      <div id="status" class="s-idle">○ 待机</div>
+    </div>
+    <div id="fps" class="fps">FPS --</div>
+  </header>
+
+  <!-- 摄像头预览 -->
+  <div class="cam-wrap">
+    <canvas id="cam" width="180" height="135"></canvas>
+    <span class="cam-tag">CAM</span>
+  </div>
+
+  <!-- 手势操作指南 -->
+  <aside id="guide" class="panel">
+    <div class="panel-title">手势操作指南</div>
+    <ul class="guide-list">
+      <li><span class="g-ico">✋</span> 张开手掌 → 斥力融解，图像化开</li>
+      <li><span class="g-ico">✊</span> 握拳 → 吸回重组清晰原图</li>
+      <li><span class="g-ico">🤏</span> 捏合拖动 → 局部搅动像素</li>
+      <li><span class="g-ico">🤲</span> 双手拉开 → 整体拉伸变形</li>
+      <li><span class="g-ico">🚫</span> 无手 → 自动归位呼吸</li>
+    </ul>
+    <div class="guide-note">补充说明：按 <b>1</b> / <b>2</b> 或点击预览切换源图 · 摄像头需在 localhost/https 下运行</div>
+    <div class="panel-subtitle">源图预览</div>
+    <div id="previews" class="previews"></div>
+  </aside>
+
+  <!-- 项目介绍 -->
+  <section id="intro" class="panel intro">
+    <blockquote>
+      <p class="intro-head">手势粒子熔炉</p>
+      <p>用你的双手把一张 AI 生成的图片融解成万千粒子，再把它重组回清晰的原图。掌心力场、握拳回吸、捏合搅动、双手拉伸 —— 一场电影级的粒子交互。</p>
+    </blockquote>
+  </section>
+
+  <!-- 环境提示 -->
+  <section id="envhint" class="panel envhint">
+    <blockquote>
+      <p>提示：浏览器要求在 <b>localhost</b> 或 <b>https</b> 环境下才能访问摄像头。</p>
+      <p>请通过本地服务器打开本页（例如 <code>python3 -m http.server</code> 后访问 http://localhost:端口/output.html）。</p>
+      <p>拒绝或无法使用摄像头时，将自动切换为鼠标模式（移动=融解，按住拖动=搅动）。</p>
+    </blockquote>
+  </section>
+
+  <!-- 底部控制栏 -->
+  <footer class="controls">
+    <button id="btn-cam" class="btn">CAM</button>
+    <button id="btn-mirror" class="btn on">镜像</button>
+    <button id="btn-switch" class="btn">切换图片 ⇄</button>
+  </footer>
+
+  <!-- 首次加载 / 权限请求遮罩 -->
+  <div id="overlay" class="overlay show">
+    <div class="overlay-box">
+      <div class="spinner"></div>
+      <div id="overlay-msg">请求权限中…</div>
+      <button id="skip" class="skip">跳过，使用鼠标交互模式</button>
+      <div class="overlay-hint">允许摄像头后，用你的手来熔炼粒子</div>
+    </div>
+  </div>
+
+  <!-- 临时提示 -->
+  <div id="toast" class="toast"></div>
+
+  <!-- 调试 HUD（诊断手势识别用，可后续移除） -->
+  <div id="debug" class="debug"></div>
+
+  <!-- 手势识别库（MediaPipe Hands）由 js/main.js 运行时动态加载，含多 CDN 容错（jsdelivr→npmmirror→unpkg） -->
+  <!-- 业务脚本 -->
+  <script src="js/images.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/hands.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

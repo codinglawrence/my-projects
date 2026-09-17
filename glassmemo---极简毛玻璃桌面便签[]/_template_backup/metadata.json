@@ -1,0 +1,6 @@
+{
+  "name": "GlassMemo - 极简毛玻璃桌面便签",
+  "description": "极简无边框毛玻璃质感桌面备忘录便签，支持按日期快速记录、全桌面自由拖拽、透明度自适应调节与丝滑交互体验。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

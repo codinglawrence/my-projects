@@ -1,0 +1,67 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1242" height="1660" viewBox="0 0 1242 1660">
+  <rect width="1242" height="1660" fill="#F5EFE0"/>
+  
+  <!-- Chapter watermark -->
+  <text x="621" y="400" font-family="Noto Serif SC, Songti SC, serif" font-size="200" font-weight="700" fill="#C4B8A8" text-anchor="middle" opacity="0.25">02</text>
+  
+  <!-- Eyebrow -->
+  <text x="100" y="160" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="16" font-weight="400" fill="#8C7B6E" letter-spacing="8">PAIN POINTS</text>
+  
+  <!-- Section heading -->
+  <text x="100" y="260" font-family="Noto Serif SC, Songti SC, serif" font-size="64" font-weight="700" fill="#2C1810">
+    你的时间<tspan fill="#B4643C">去哪了</tspan>？
+  </text>
+  
+  <!-- Rule -->
+  <line x1="100" y1="290" x2="300" y2="290" stroke="#B4643C" stroke-width="2"/>
+  
+  <!-- Card grid: 2×2 -->
+  <!-- Card 1 -->
+  <rect x="100" y="370" width="496" height="260" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="140" y="420" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="700" fill="#2C1810">时间感知偏差</text>
+  <text x="140" y="460" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#8C7B6E">
+    <tspan x="140" dy="0">人对时间的感知误差高达 40%</tspan>
+    <tspan x="140" dy="30">你以为工作了 4 小时，实际有效</tspan>
+    <tspan x="140" dy="30">时间可能只有 2 小时</tspan>
+  </text>
+  <text x="556" y="610" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="48" font-weight="700" fill="#B4643C" text-anchor="end">±40%</text>
+  
+  <!-- Card 2 -->
+  <rect x="646" y="370" width="496" height="260" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="686" y="420" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="700" fill="#2C1810">追踪门槛过高</text>
+  <text x="686" y="460" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#8C7B6E">
+    <tspan x="686" dy="0">传统时间管理需要 6 步才能</tspan>
+    <tspan x="686" dy="30">开始计时；TimeQuest 只需</tspan>
+    <tspan x="686" dy="30">2 步：打开 → 点击</tspan>
+  </text>
+  <text x="1102" y="610" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="48" font-weight="700" fill="#B4643C" text-anchor="end">6步→2步</text>
+  
+  <!-- Card 3 -->
+  <rect x="100" y="680" width="496" height="260" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="140" y="730" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="700" fill="#2C1810">时间去向不明</text>
+  <text x="140" y="770" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#8C7B6E">
+    <tspan x="140" dy="0">不知道时间花在哪里，就像</tspan>
+    <tspan x="140" dy="30">不知道钱花在哪里 — 没有数据</tspan>
+    <tspan x="140" dy="30">就无法优化</tspan>
+  </text>
+  <text x="556" y="920" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="48" font-weight="700" fill="#B4643C" text-anchor="end">数据驱动</text>
+  
+  <!-- Card 4 -->
+  <rect x="646" y="680" width="496" height="260" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="686" y="730" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="700" fill="#2C1810">无法偿还时间债</text>
+  <text x="686" y="770" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#8C7B6E">
+    <tspan x="686" dy="0">拖延和低效积累的时间负债</tspan>
+    <tspan x="686" dy="30">如果不追踪就永远无法偿还</tspan>
+  </text>
+  <text x="1102" y="920" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="48" font-weight="700" fill="#8B4513" text-anchor="end">时间债务</text>
+  
+  <!-- Footer rule -->
+  <line x1="100" y1="1000" x2="1142" y2="1000" stroke="#D4C8B4" stroke-width="1"/>
+  
+  <!-- Insight quote -->
+  <text x="621" y="1100" font-family="Noto Serif SC, Songti SC, serif" font-size="28" font-weight="400" fill="#2C1810" text-anchor="middle" font-style="italic">每一分钟的浪费，都是未来的负债</text>
+  <text x="621" y="1150" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#C4B8A8" text-anchor="middle">— 时间负债核心概念</text>
+  
+  <!-- Page number -->
+  <text x="1142" y="1600" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#C4B8A8" text-anchor="end">02 / 05</text>
+</svg>

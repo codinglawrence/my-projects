@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>时间负债</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+      background-color: #F9F9FB;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .time-debt-page {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 导航栏 */
+    .custom-nav-bar {
+      background-color: #6366F1;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      position: relative;
+    }
+
+    .nav-left, .nav-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-title {
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 500;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    /* 内容区域 */
+    .content {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 仪表盘头部 */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 16px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-header h2 {
+      font-size: 18px;
+      color: #1C1C1E;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: #6366F1;
+      color: white;
+    }
+
+    .btn-default {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    /* 核心指标区域 */
+    .part1 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .history-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .history-section h3 {
+      margin-bottom: 16px;
+      font-size: 16px;
+      color: #1C1C1E;
+      font-weight: 500;
+    }
+
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      padding: 8px;
+      border-bottom: 1px solid #EFEFF4;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-year {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1C1C1E;
+      margin-bottom: 6px;
+    }
+
+    .history-details {
+      font-size: 12px;
+      color: #6E6E73;
+      line-height: 1.5;
+    }
+
+    .history-details div {
+      margin-bottom: 4px;
+    }
+
+    .delete-btn {
+      margin-top: 8px;
+      padding: 4px 8px;
+      background-color: #EF4444;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* 指标卡片 */
+    .metric-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      height: 100%;
+    }
+
+    .metric-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border: 1px solid #e3e3e3;
+    }
+
+    .metric-card.positive .metric-value {
+      color: #34c759;
+    }
+
+    .metric-card.negative .metric-value {
+      color: #ff3b30;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      color: #6e6e73;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1d1d1f;
+    }
+
+    /* 图表部分 */
+    .chart-section {
+      background-color: white;
+      border-radius: 6px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      margin-bottom: 16px;
+    }
+
+    .chart-section h3 {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #1C1C1E;
+      font-weight: 500;
+    }
+
+    .chart-placeholder {
+      height: 120px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .chart-bar-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 100%;
+      width: 100%;
+      padding-bottom: 30px;
+    }
+
+    .chart-bar-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+    }
+
+    .chart-bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      transition: height 0.3s ease;
+      min-height: 4px;
+    }
+
+    .chart-label {
+      font-size: 12px;
+      color: #AEAEB2;
+      margin-top: 8px;
+    }
+
+    /* 对比部分 */
+    .comparison-section {
+      background-color: white;
+      border-radius: 6px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      margin-bottom: 16px;
+    }
+
+    .comparison-section h3 {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #1C1C1E;
+      font-weight: 500;
+    }
+
+    .comparison-card {
+      background-color: #F9F9FB;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .comparison-title {
+      font-size: 12px;
+      color: #6E6E73;
+      margin-bottom: 8px;
+    }
+
+    .comparison-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background-color: #EFEFF4;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #6366F1;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      font-weight: bold;
+      color: #1C1C1E;
+      min-width: 50px;
+      text-align: right;
+    }
+
+    .comparison-value {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .comparison-value.positive {
+      color: #10B981;
+    }
+
+    .comparison-value.negative {
+      color: #EF4444;
+    }
+
+    /* 空状态 */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      color: #AEAEB2;
+      margin-bottom: 8px;
+    }
+
+    .empty-subtext {
+      font-size: 14px;
+      color: #6E6E73;
+      margin-bottom: 24px;
+    }
+
+    .empty-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* 表单样式 */
+    .form-container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      color: #1C1C1E;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #EFEFF4;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #6366F1;
+    }
+
+    .input-hint {
+      font-size: 14px;
+      color: #AEAEB2;
+      margin-left: 4px;
+    }
+
+    .button-container {
+      margin-top: 24px;
+    }
+
+    .btn-block {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    /* 底部加号按钮 */
+    .add-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background-color: #6366F1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      z-index: 100;
+    }
+
+    .add-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* 模态框 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: white;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      width: 500px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #EFEFF4;
+    }
+
+    .modal-header h2, .modal-header h3 {
+      font-size: 20px;
+      color: #1C1C1E;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      font-size: 24px;
+      color: #AEAEB2;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    /* 指南内容 */
+    .guide-section {
+      margin-bottom: 20px;
+    }
+
+    .guide-section h3 {
+      margin-bottom: 12px;
+      font-size: 16px;
+      color: #6366F1;
+      font-weight: 500;
+    }
+
+    .guide-section p {
+      font-size: 14px;
+      color: #6E6E73;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .formula {
+      font-family: 'Courier New', monospace;
+      background-color: #F9F9FB;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #6366F1;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .guide-section ul, .guide-section ol {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .guide-section li {
+      font-size: 14px;
+      color: #6E6E73;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    /* 术语解释 */
+    .term-item {
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #EFEFF4;
+    }
+
+    .term-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .term-item h4 {
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #6366F1;
+      font-weight: 500;
+    }
+
+    .term-item p {
+      font-size: 14px;
+      color: #6E6E73;
+      line-height: 1.5;
+    }
+
+    /* 隐藏类 */
+    .hidden {
+      display: none !important;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .part1 {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="time-debt-page">
+    <!-- 导航栏 -->
+    <div class="custom-nav-bar">
+      <div class="nav-left">
+        <span class="nav-icon" onclick="history.back()">←</span>
+      </div>
+      <div class="nav-title">时间负债</div>
+      <div class="nav-right">
+        <span class="nav-icon" onclick="showGuideModal()">?</span>
+      </div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content">
+      <!-- 仪表盘 -->
+      <div id="dashboardSection" class="dashboard-section hidden">
+        <div class="dashboard-header">
+          <h2>时间负债仪表盘</h2>
+          <div class="header-actions">
+            <button class="btn btn-default" onclick="showTerminologyModal()">术语解释</button>
+            <button class="btn btn-primary" onclick="showAddForm()">添加数据</button>
+          </div>
+        </div>
+
+        <div class="part1">
+          <div class="history-section">
+            <h3>历史参数</h3>
+            <div id="historyList" class="history-list"></div>
+          </div>
+          <div class="metrics-container">
+            <div class="metric-cards">
+              <div class="metric-card positive">
+                <div class="metric-label">已利用时间价值</div>
+                <div id="totalValueEvaluation" class="metric-value">¥0.00</div>
+              </div>
+              <div class="metric-card negative">
+                <div class="metric-label">实际已利用时间负债</div>
+                <div id="totalActualDebt" class="metric-value">¥0.00</div>
+              </div>
+              <div class="metric-card positive">
+                <div class="metric-label">价值净值</div>
+                <div id="valueNetWorth" class="metric-value">¥0.00</div>
+              </div>
+              <div class="metric-card negative">
+                <div class="metric-label">理想已利用时间负债</div>
+                <div id="totalIdealDebt" class="metric-value">¥0.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 趋势图表 -->
+        <div class="chart-section">
+          <h3>价值积累趋势</h3>
+          <div class="chart-placeholder">
+            <div id="chartContainer" class="chart-bar-container"></div>
+          </div>
+        </div>
+
+        <!-- 对比仪表盘 -->
+        <div class="comparison-section">
+          <h3>实际 vs 理想</h3>
+          <div class="comparison-cards">
+            <div class="comparison-card">
+              <div class="comparison-title">时间价值实现率</div>
+              <div class="comparison-progress">
+                <div class="progress-bar">
+                  <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div id="progressText" class="progress-text">0.0%</div>
+              </div>
+            </div>
+            <div class="comparison-card">
+              <div class="comparison-title">理想负债差距</div>
+              <div id="idealDebtGap" class="comparison-value">¥0.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 空状态 -->
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">📊</div>
+        <div class="empty-text">开始你的时间价值之旅</div>
+        <div class="empty-subtext">时间负债帮助你量化时间价值，评估时间使用效率</div>
+        <div class="empty-actions">
+          <button class="btn btn-primary" onclick="showGuideModal()">了解更多</button>
+          <button class="btn btn-default" onclick="showAddForm()">立即开始</button>
+        </div>
+      </div>
+
+      <!-- 表单 -->
+      <div id="formSection" class="form-container hidden">
+        <form id="timeDebtForm" onsubmit="handleSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">年份</label>
+            <select id="year" class="form-input" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">年收入 <span class="input-hint">¥</span></label>
+            <input type="number" id="annualIncome" class="form-input" placeholder="请输入年收入" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">有效工作天数 <span class="input-hint">天</span></label>
+            <input type="number" id="workDays" class="form-input" placeholder="请输入有效工作天数" value="250" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">日均工作时长 <span class="input-hint">小时</span></label>
+            <input type="number" id="dailyHours" class="form-input" placeholder="请输入日均工作时长" value="8" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">理想时薪 <span class="input-hint">¥/小时</span></label>
+            <input type="number" id="idealHourlyRate" class="form-input" placeholder="请输入理想时薪（建议值：当前时薪的1.5-2倍）" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">理想时间负债 <span class="input-hint">¥</span></label>
+            <input type="text" id="calculatedIdealTimeDebt" class="form-input" readonly placeholder="自动计算">
+          </div>
+
+          <div class="button-container">
+            <button type="submit" class="btn btn-primary btn-block">计算并保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 底部加号按钮 -->
+    <div class="add-btn" onclick="showAddForm()">+</div>
+
+    <!-- 功能介绍模态框 -->
+    <div id="guideModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'guideModal')">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>什么是时间负债？</h2>
+          <button class="close-btn" onclick="closeModal('guideModal')">×</button>
+        </div>
+        <div class="guide-content">
+          <div class="guide-section">
+            <h3>🎯 功能目标</h3>
+            <p>时间负债帮助你量化时间的价值，做出更明智更清晰的时间投资决策，提醒你<strong>更多、更好</strong>的利用时间</p>
+          </div>
+          <div class="guide-section">
+            <h3>📊 核心概念</h3>
+            <ul>
+              <li><strong>时薪[元/小时]</strong>：<br><span class="formula">年收入 ÷ (工作天数 × 每天工作小时数)</span></li>
+              <li><strong>年度负债[元]</strong>：<br><span class="formula">一年总小时数 × 时薪</span></li>
+              <li><strong>理想时薪[元/小时]</strong>：<br><span class="formula">你期望达到的每小时价值（用户输入）</span></li>
+              <li><strong>理想负债[元]</strong>：<br><span class="formula">一年总小时数 × 理想时薪</span></li>
+              <li><strong>价值净值[元]</strong>：<br><span class="formula">已利用时间价值 - 相应单位负债</span></li>
+            </ul>
+          </div>
+          <div class="guide-section">
+            <h3>💡 使用步骤</h3>
+            <ol>
+              <li>点击右下角加号按钮</li>
+              <li>填写你的年收入、工作天数等信息</li>
+              <li>设置你的理想时薪</li>
+              <li>系统会自动计算并展示你的时间负债情况</li>
+            </ol>
+          </div>
+        </div>
+        <div class="guide-footer">
+          <button class="btn btn-primary btn-block" onclick="closeModal('guideModal')">我知道了</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 术语解释模态框 -->
+    <div id="terminologyModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'terminologyModal')">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>术语解释</h3>
+          <button class="close-btn" onclick="closeModal('terminologyModal')">×</button>
+        </div>
+        <div class="modal-content">
+          <div class="term-item">
+            <h4>时间负债</h4>
+            <p>基于理想时薪计算的年度时间总价值，代表你一年时间的理想价值</p>
+          </div>
+          <div class="term-item">
+            <h4>时薪</h4>
+            <p>你的实际 hourly 价值，基于年收入和工作时长计算得出</p>
+          </div>
+          <div class="term-item">
+            <h4>理想时薪</h4>
+            <p>你期望达到的 hourly 价值，反映了你的职业目标和自我价值认知</p>
+          </div>
+          <div class="term-item">
+            <h4>价值净值</h4>
+            <p>已利用时间的价值减去实际时间负债，反映了你的时间使用效率</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 数据存储
+    let savedData = [];
+    let timeEntries = [];
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      loadSavedData();
+      loadTimeEntries();
+      generateYearOptions();
+      updateUI();
+
+      // 监听输入变化，自动计算理想时间负债
+      document.getElementById('idealHourlyRate').addEventListener('input', calculateIdealTimeDebt);
+    });
+
+    // 从 localStorage 加载数据
+    function loadSavedData() {
+      const data = localStorage.getItem('timeDebtData');
+      if (data) {
+        try {
+          savedData = JSON.parse(data);
+        } catch (error) {
+          console.error('Failed to parse time debt data:', error);
+          savedData = [];
+        }
+      }
+    }
+
+    // 加载时间记录（从主应用共享的 localStorage）
+    function loadTimeEntries() {
+      const data = localStorage.getItem('timeEntries');
+      if (data) {
+        try {
+          timeEntries = JSON.parse(data);
+          // 反序列化 Date 对象
+          timeEntries = timeEntries.map(entry => ({
+            ...entry,
+            startTime: entry.startTime && entry.startTime.$date ? new Date(entry.startTime.$date) : new Date(entry.startTime),
+            endTime: entry.endTime && entry.endTime.$date ? new Date(entry.endTime.$date) : entry.endTime ? new Date(entry.endTime) : null,
+            createdAt: entry.createdAt && entry.createdAt.$date ? new Date(entry.createdAt.$date) : new Date(entry.createdAt)
+          }));
+        } catch (error) {
+          console.error('Failed to parse time entries:', error);
+          timeEntries = [];
+        }
+      }
+    }
+
+    // 保存数据
+    function saveData(data) {
+      savedData.push(data);
+      localStorage.setItem('timeDebtData', JSON.stringify(savedData));
+    }
+
+    // 生成年份选项
+    function generateYearOptions() {
+      const currentYear = new Date().getFullYear();
+      const yearSelect = document.getElementById('year');
+      for (let i = currentYear; i >= currentYear - 10; i--) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + '年';
+        if (i === currentYear - 1) {
+          option.selected = true;
+        }
+        yearSelect.appendChild(option);
+      }
+    }
+
+    // 计算理想时间负债
+    function calculateIdealTimeDebt() {
+      const idealHourlyRate = parseFloat(document.getElementById('idealHourlyRate').value) || 0;
+      const totalHoursInYear = 365 * 24;
+      const idealTimeDebt = idealHourlyRate * totalHoursInYear;
+      document.getElementById('calculatedIdealTimeDebt').value = idealTimeDebt > 0 ? '¥' + idealTimeDebt.toFixed(2) : '';
+    }
+
+    // 计算时薪
+    function calculateHourlyRate(annualIncome, workDays, dailyHours) {
+      if (workDays <= 0 || dailyHours <= 0 || annualIncome <= 0) {
+        return 0;
+      }
+      const totalHours = workDays * dailyHours;
+      return annualIncome / totalHours;
+    }
+
+    // 处理表单提交
+    function handleSubmit(event) {
+      event.preventDefault();
+
+      const year = parseInt(document.getElementById('year').value);
+      const annualIncome = parseFloat(document.getElementById('annualIncome').value);
+      const workDays = parseFloat(document.getElementById('workDays').value);
+      const dailyHours = parseFloat(document.getElementById('dailyHours').value);
+      const idealHourlyRate = parseFloat(document.getElementById('idealHourlyRate').value);
+
+      const hourlyRate = calculateHourlyRate(annualIncome, workDays, dailyHours);
+      const totalHoursInYear = 365 * 24;
+      const idealTimeDebt = idealHourlyRate * totalHoursInYear;
+
+      const data = {
+        year,
+        workDays,
+        dailyHours,
+        annualIncome,
+        hourlyRate,
+        idealHourlyRate,
+        idealTimeDebt,
+        savedAt: new Date().toISOString()
+      };
+
+      saveData(data);
+      hideAddForm();
+      updateUI();
+    }
+
+    // 删除数据
+    function deleteItem(year) {
+      if (confirm('确定要删除 ' + year + ' 年的数据吗？')) {
+        savedData = savedData.filter(item => item.year !== year);
+        localStorage.setItem('timeDebtData', JSON.stringify(savedData));
+        updateUI();
+      }
+    }
+
+    // 更新UI
+    function updateUI() {
+      const hasData = savedData.length > 0 && savedData.some(item => item.annualIncome > 0);
+
+      if (hasData) {
+        document.getElementById('dashboardSection').classList.remove('hidden');
+        document.getElementById('emptyState').classList.add('hidden');
+        updateDashboard();
+      } else {
+        document.getElementById('dashboardSection').classList.add('hidden');
+        document.getElementById('emptyState').classList.remove('hidden');
+      }
+
+      document.getElementById('formSection').classList.add('hidden');
+    }
+
+    // 更新仪表盘
+    function updateDashboard() {
+      // 过滤有效数据并按年份排序
+      const validData = savedData.filter(item => item.annualIncome > 0).sort((a, b) => b.year - a.year);
+      const latestData = validData[0];
+
+      if (!latestData) return;
+
+      // 更新历史列表
+      const historyList = document.getElementById('historyList');
+      historyList.innerHTML = validData.map(item => `
+        <div class="history-item">
+          <div class="history-year">${item.year}年</div>
+          <div class="history-details">
+            <div>时薪: ¥${item.hourlyRate.toFixed(2)}</div>
+            <div>理想时薪: ¥${item.idealHourlyRate.toFixed(2)}</div>
+            <div>理想负债: ¥${item.idealTimeDebt.toFixed(2)}</div>
+            <button class="delete-btn" onclick="deleteItem(${item.year})">删除</button>
+          </div>
+        </div>
+      `).join('');
+
+      // 计算核心指标
+      const totalValueEvaluation = timeEntries.reduce((total, entry) => total + (entry.valueEvaluation || 0), 0);
+
+      const hourlyRateMinute = latestData.hourlyRate / 60;
+      const totalActualDebt = timeEntries.reduce((total, entry) => total + (hourlyRateMinute * (entry.duration || 0)), 0);
+
+      const valueNetWorth = totalValueEvaluation - totalActualDebt;
+
+      const idealHourlyRateMinute = latestData.idealHourlyRate / 60;
+      const totalIdealDebt = timeEntries.reduce((total, entry) => total + (idealHourlyRateMinute * (entry.duration || 0)), 0);
+
+      const valueRealizationRate = totalActualDebt === 0 ? 0 : (totalValueEvaluation / totalActualDebt) * 100;
+      const idealDebtGap = totalValueEvaluation - totalIdealDebt;
+
+      // 更新指标显示
+      document.getElementById('totalValueEvaluation').textContent = '¥' + totalValueEvaluation.toFixed(2);
+      document.getElementById('totalActualDebt').textContent = '¥' + totalActualDebt.toFixed(2);
+      document.getElementById('valueNetWorth').textContent = '¥' + valueNetWorth.toFixed(2);
+      document.getElementById('totalIdealDebt').textContent = '¥' + totalIdealDebt.toFixed(2);
+
+      // 更新进度条
+      document.getElementById('progressFill').style.width = Math.min(valueRealizationRate, 100) + '%';
+      document.getElementById('progressText').textContent = valueRealizationRate.toFixed(1) + '%';
+
+      // 更新理想负债差距
+      const idealDebtGapEl = document.getElementById('idealDebtGap');
+      idealDebtGapEl.textContent = '¥' + idealDebtGap.toFixed(2);
+      idealDebtGapEl.className = 'comparison-value ' + (idealDebtGap >= 0 ? 'positive' : 'negative');
+
+      // 更新趋势图表
+      updateTrendChart();
+    }
+
+    // 更新趋势图表
+    function updateTrendChart() {
+      const dailyData = {};
+      timeEntries.forEach(entry => {
+        const dateKey = new Date(entry.startTime).toISOString().split('T')[0];
+        if (!dailyData[dateKey]) {
+          dailyData[dateKey] = 0;
+        }
+        dailyData[dateKey] += (entry.valueEvaluation || 0);
+      });
+
+      const sortedData = Object.entries(dailyData)
+        .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
+        .slice(-7);
+
+      const maxValue = Math.max(...Object.values(dailyData), 1);
+
+      const chartContainer = document.getElementById('chartContainer');
+      chartContainer.innerHTML = sortedData.map(([date, value]) => {
+        const height = (value / maxValue) * 100;
+        const formattedDate = date.split('-').slice(1).join('/');
+        return `
+          <div class="chart-bar-wrapper">
+            <div class="chart-bar" style="height: ${height}%; background-color: ${value > 0 ? '#10B981' : '#EF4444'}"></div>
+            <div class="chart-label">${formattedDate}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 显示/隐藏表单
+    function showAddForm() {
+      document.getElementById('formSection').classList.remove('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('emptyState').classList.add('hidden');
+    }
+
+    function hideAddForm() {
+      document.getElementById('formSection').classList.add('hidden');
+      document.getElementById('timeDebtForm').reset();
+      updateUI();
+    }
+
+    // 模态框控制
+    function showGuideModal() {
+      document.getElementById('guideModal').classList.add('active');
+    }
+
+    function showTerminologyModal() {
+      document.getElementById('terminologyModal').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    function closeModalOnOverlay(event, modalId) {
+      if (event.target === document.getElementById(modalId)) {
+        closeModal(modalId);
+      }
+    }
+
+    // 监听 localStorage 变化（当主应用更新数据时）
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'timeEntries') {
+        loadTimeEntries();
+        updateUI();
+      }
+    });
+  </script>
+</body>
+</html>

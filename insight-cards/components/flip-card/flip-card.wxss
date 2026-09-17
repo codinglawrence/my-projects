@@ -1,0 +1,203 @@
+/* components/flip-card/flip-card.wxss */
+/* 金属全息双面卡：
+   - 顶层 .flip-card isolation: isolate，把 color-dodge 混合限制在卡内；
+   - .fc-foil-layer (= 旧 :before) 稀有度渐变眩光（<view>），color-dodge（仅 view 允许）优雅增强，
+       背景位置由 JS(fcFoilPos) 驱动；重力未授权(.idle)时开启轻微流动。
+   - .fc-holo-layer (= 旧 :after)  真实箔纹理 <image>，dataUri 来自 data/textures.js 的 getTexture。
+       纹理用 opacity 以 normal 模式叠加（<image> 的 mix-blend 真机失效，绝不挂），不内联 base64。
+   - 箔层 z-index 1..3 夹在 bg(z1) 与 fg(z4) 之间，fg 永远最高；actions z5。 */
+
+/* 外层 wrapper：不参与 3D 旋转，负责圆角与投影。
+   修复「倾斜砍边角」：原 overflow:hidden 是一扇固定圆角窗户，卡牌 3D 倾斜时
+   卡角会被它啃掉、露出深色页面背景，box-shadow 也被裁没。故移除 overflow:hidden，
+   让卡牌整体自由 3D 倾斜；箔光溢出由 .fc-layers 自身的 overflow:hidden 裁切。 */
+.flip-card-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 24rpx;
+  box-shadow: 0 18rpx 40rpx rgba(0, 0, 0, 0.55);
+}
+
+.flip-card {
+  width: 100%;
+  height: 100%;
+  /* 父级 3D 透视：为 tilt / flip 提供景深 */
+  perspective: 1200rpx;
+  /* 关键：让 color-dodge 只在卡面内与卡底/卡图混合，不外溢 */
+  isolation: isolate;
+}
+
+/* 倾斜层：承载手指触控倾斜(rotateX/Y)，transform 完全由 JS lerp(setData tiltStyle) 驱动。
+   触控输入（onTouchMove→_onTiltInput→_applyGyroTick）经归一化[-1,1]映射后回写 tiltStyle；
+   重力感应已禁用保留（见 flip-card.js 顶部说明）。
+   不挂任何 transform 类 CSS 动画（原 holoCard 入场动画会覆盖内联 transform、遮蔽倾斜），
+   仅保留 transition 作兜底平滑，与 JS 缓动不冲突。 */
+.fc-tilt {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  /* 缓动兜底：即便 tick 抖动，transform 也有 0.12s 平滑过渡（与 JS lerp 不冲突） */
+  transition: transform 0.12s linear;
+}
+/* 手指拖动中：关闭过渡，倾斜即时跟手 */
+.fc-tilt.is-dragging {
+  animation: none;
+  transition: none;
+}
+
+/* 旋转体：承载 flip（rotateY 0↔180）。0.45s 慢动作翻转，手感接近真实镭射卡 */
+.fc-rotator {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.34, 0.0, 0.2, 1);
+}
+
+/* 正反两面：绝对居中重叠，隐藏背面 */
+.fc-face {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 24rpx;
+  /* 注意：此处不再 overflow:hidden。子层（bg/fg/foil/holo）自带 border-radius，
+     大角度 3D 倾斜时它们可以超出 face 的未旋转本地边界，由 .flip-card 统一裁切，
+     从而保证箔光始终覆盖到卡面视觉四角，不露裸卡 */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+.fc-front { transform: rotateY(0deg); }
+.fc-back  { transform: rotateY(180deg); }
+
+.flip-card.is-flipped .fc-front { opacity: 0; }
+.flip-card.is-flipped .fc-back  { opacity: 1; }
+.flip-card.is-flipped .fc-rotator { transform: rotateY(180deg); }
+
+/* 卡面拆两层：底层 bg（装饰容器，被箔纹镀膜更金属） + 顶层 fg（透明底，文字符号最高层） */
+.flip-face-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border-radius: 24rpx;
+  display: block;
+  z-index: 1;
+}
+.flip-face-fg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border-radius: 24rpx;
+  display: block;
+  pointer-events: none;
+  z-index: 4;   /* 文字符号最高层，箔纹(1..3)无法遮挡 */
+}
+
+/* ===========================================================
+   两层金属镭射（按 card.rarity 由 wx:for 渲染，最多 2 层）
+   =========================================================== */
+
+/* 箔光层容器：箔层(.fc-foil-layer/.fc-holo-layer)的【直接】父级，
+   自身 overflow:hidden + border-radius 即可正常裁切 holo 的 overscan(140%)，
+   不踩「祖先 overflow 对 3D 孙级失效」的坑（箔层是直接子级，非孙级）。
+   修复黑框：原 clip-path: inset(0 round 24rpx) + transform: translateZ(0)
+   在微信 WebView 合成层上会产生 1rpx 黑边伪影，故移除这两者，只留 overflow:hidden。 */
+.fc-layers {
+  position: absolute;
+  inset: 0;
+  border-radius: 24rpx;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;                    /* 位于 bg(z1) 之上、fg(z4) 之下 */
+}
+
+/* 通用箔层容器：绝对铺满卡面、不参与点击（点击由 bg/fg 的 catchtap 接管） */
+.fc-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: 24rpx;
+  pointer-events: none;
+}
+
+/* .fc-foil-layer：渐变 <view> 层（可 color-dodge）。背景位置由内联 fcFoilPos 驱动；
+   默认不挂动画，让触控/重力完全接管；仅 .idle 兜底时轻微流动。
+   注意：foil 层用 background-position 移动，层本身必须严格贴合卡面（inset:0），
+   不能像 holo 那样 overscan，否则倾斜时会露出“背后的彩虹页面”边缘。 */
+.fc-foil-layer {
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-size: 120% 120%;
+  background-repeat: no-repeat;
+  transition: background-position 0.1s linear;
+}
+.flip-card.idle .fc-foil-layer { animation: idleFoil 7s ease-in-out infinite; }
+
+/* .fc-holo-layer：真实箔纹理 <image> 层（dataUri，normal 混合）。
+   略放大并偏移，留出视差平移空间（父 .fc-face 已 overflow:hidden 裁切）。 */
+/* 放大并负偏移，确保大角度 3D 倾斜 + ±HOLOMOVE% 平移时纹理层始终过覆盖卡面，
+   四角不露没箔光的裸卡（修复：倾斜时光照四角漏光） */
+.fc-holo-layer {
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  display: block;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* 回退：SDK < 2.11.1 不支持 clip-path 时，holo 不再 overscan（牺牲一点视差但不溢出）；
+   foil 保持 inset:0 本就安全，无需回退 */
+.flip-card.no-clip-path .fc-holo-layer {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* clip-frame：只镀四边环带、中央镂空（gold 等 frame 稀有度）。箔绝不遮中央文字/符号/点数。 */
+.flip-card.clip-frame .fc-layer {
+  clip-path: inset(0 0 86% 0), inset(86% 0 0 0), inset(0 86% 0 0), inset(0 0 0 86%);
+}
+
+/* 空闲时彩虹渐变缓慢流动（位置由动画驱动；触摸时动画关闭改用内联 fcFoilPos） */
+@keyframes idleFoil {
+  0%, 100% { background-position: 50% 50%; }
+  25%      { background-position: 100% 100%; }
+  50%      { background-position: 0% 0%; }
+  75%      { background-position: 100% 40%; }
+}
+/* 纹理层流动（滚筒/收藏用，flip-card 纹理层以 fcHoloShift 平移为主，不挂此动画以免冲突） */
+@keyframes flow {
+  0%, 100% { transform: translate(0%, 0%) scale(1); }
+  50%      { transform: translate(3%, -2%) scale(1.05); }
+}
+/* 纹理层闪烁（galaxy/shiny） */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.18; }
+  50%      { opacity: 0.34; }
+}
+
+/* 背面底部操作条 */
+.fc-actions {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28rpx;
+  box-sizing: border-box;
+  background: linear-gradient(to top, rgba(17, 9, 5, 0.86), rgba(17, 9, 5, 0));
+  border-radius: 0 0 24rpx 24rpx;
+  opacity: 0;
+  transform: translateY(10rpx);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 5;   /* 操作条最顶，高于 fg(z:4) */
+}
+.fc-actions.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.fc-fav { font-size: 26rpx; color: #C9A227; letter-spacing: 1rpx; }
+.fc-fav.on { color: #E8CE7A; }
+.fc-note { font-size: 26rpx; color: #EFE3C8; letter-spacing: 1rpx; }

@@ -1,0 +1,97 @@
+/* ============================================
+   时间管理APP - 设计规范
+   配色: 苹果高级简约感 + 安卓原生体验
+   ============================================ */
+
+:root {
+  /* ===== 主色系 ===== */
+  --color-primary: #6366F1;           /* 品牌紫 - 底部导航选中态、主按钮、计时器边框 */
+  --color-primary-light: #F5F5FF;     /* 轻量紫 - 卡片选中背景、输入框聚焦边框 */
+  --color-primary-dark: #4F46E5;      /* 暗调紫 - 按钮按下态、计时器数字强调 */
+
+  /* ===== 功能色 ===== */
+  --color-success: #10B981;           /* 进行中（绿）- 计时器进行中状态、趋势上升 */
+  --color-warning: #F59E0B;           /* 暂停（暖黄）- 计时器暂停状态、提醒类标签 */
+  --color-ended: #6B7280;             /* 结束（冷灰）- 计时器结束状态、已完成历史记录 */
+  --color-error: #EF4444;             /* 警告（柔红）- 时间负债负值、错误提示、删除操作 */
+
+  /* ===== 中性色 ===== */
+  --color-text-primary: #1C1C1E;      /* 正文黑 - 标题、活动名称、计时器核心数字 */
+  --color-text-secondary: #6E6E73;    /* 次要文本 - 时间戳、类别标签、表单提示文字 */
+  --color-text-tertiary: #AEAEB2;     /* 占位文本 - 输入框占位符、禁用态文字 */
+  --color-background: #FFFFFF;        /* 纯白背景 - 页面主背景、卡片底色 */
+  --color-surface: #F9F9FB;           /* 浅灰背景 - 滚动区域背景、轮盘选择器底色 */
+  --color-border: #EFEFF4;            /* 分割线/边框 - 组件分隔线、卡片边框、列表分隔线 */
+
+  /* ===== 间距规范 ===== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+
+  /* ===== 圆角规范 ===== */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* ===== 字体规范 ===== */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+  --font-family-mono: 'Roboto Mono', 'SF Mono', monospace;
+
+  /* ===== 字号规范 (sp基准) ===== */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-timer: 48px;
+  --font-size-timer-sm: 36px;
+
+  /* ===== 字重规范 ===== */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* ===== 行高规范 ===== */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+
+  /* ===== 阴影规范 (苹果风 - 极少使用) ===== */
+  --shadow-none: none;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* ===== 全局样式重置 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Vant组件主题覆盖 ===== */
+:root {
+  /* Vant主题变量覆盖 */
+  --van-primary-color: var(--color-primary);
+  --van-success-color: var(--color-success);
+  --van-warning-color: var(--color-warning);
+  --van-danger-color: var(--color-error);
+  --van-text-color: var(--color-text-primary);
+  --van-text-color-2: var(--color-text-secondary);
+  --van-text-color-3: var(--color-text-tertiary);
+  --van-background: var(--color-background);
+  --van-background-2: var(--color-surface);
+  --van-border-color: var(--color-border);
+}

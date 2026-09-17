@@ -1,0 +1,45 @@
+{
+  "name": "biliinsight-desktop",
+  "version": "1.0.0",
+  "description": "BiliInsight 桌面端（Electron + Flask sidecar / PyInstaller backend.exe）",
+  "main": "main.js",
+  "author": "BiliInsight Team",
+  "private": true,
+  "scripts": {
+    "dev": "electron . --dev",
+    "build": "node build.mjs",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.biliinsight.desktop",
+    "productName": "BiliInsight",
+    "copyright": "Copyright © 2026 BiliInsight",
+    "files": [
+      "main.js",
+      "preload.js",
+      "backend-launcher.js",
+      "package.json"
+    ],
+    "extraResources": [
+      { "from": "app/backend.exe", "to": "backend.exe" },
+      { "from": "app/dist", "to": "dist" }
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": ["nsis"],
+      "icon": "build-resources/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "BiliInsight-Setup-${version}.${ext}"
+    }
+  }
+}

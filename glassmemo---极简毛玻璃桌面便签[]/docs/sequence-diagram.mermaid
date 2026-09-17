@@ -1,0 +1,113 @@
+sequenceDiagram
+  autonumber
+  title 桌面挂件模式启动 + 模式切换 + 嵌入失败降级
+
+  participant U as User
+  participant Tray as TrayMenu
+  participant Main as main.cjs (LayerController)
+  participant Win as BrowserWindow
+  participant DL as desktop-layer.cjs (Koffi)
+  participant Win32 as Windows OS (Progman/WorkerW)
+  participant PL as preload.cjs (IpcBridge)
+  participant R as React (PinToggleButton)
+  participant Diag as _diag.cjs
+
+  %% ===== 场景 1：app 启动 → ready-to-show → applyLayer → attachToDesktop =====
+  rect rgb(230, 245, 255)
+    Note over Main,Win32: 场景 1：默认启动 → 桌面挂件模式
+    U->>Main: npm run electron:dev / 双击 exe
+    Main->>Win: new BrowserWindow(frameless, transparent, alwaysOnTop=false)
+    Win-->>Main: 实例
+    Main->>Win: loadURL(vite dev server / file://dist)
+    Main->>Win: once('ready-to-show', applyLayer)
+    Win-->>Main: ready-to-show
+    Main->>Win: getNativeWindowHandle() → hwndBuffer
+    Main->>DL: findDesktopWorkerW()
+    DL->>Win32: FindWindowW('Progman', null)
+    Win32-->>DL: progmanHwnd
+    DL->>Win32: FindWindowExW(progmanHwnd, 0, 'WorkerW', null)
+    Win32-->>DL: workerWHwnd
+    DL->>DL: validateHwndBuffer + koffi.address(buf)
+    DL->>Win32: SendMessageTimeoutW(progmanHwnd, 0x052C, …)
+    DL->>Win32: SetParent(winHwnd, workerWHwnd)
+    alt 成功
+      Win32-->>DL: ok
+      DL-->>Main: AttachResult{ok:true, mode:'desktop-widget'}
+      Main->>Main: pinned=false, lastMode='desktop-widget'
+      Main->>Tray: refreshTooltip('GlassMemo · 桌面挂件')
+      Main->>PL: send('pin:change', {pinned:false, mode:'desktop-widget'})
+      PL->>R: onChange(state)
+    end
+  end
+
+  %% ===== 场景 2：托盘点击「窗口置顶」 → detach + setAlwaysOnTop =====
+  rect rgb(255, 245, 230)
+    Note over U,Tray: 场景 2：托盘勾选「窗口置顶」
+    U->>Tray: 勾选「窗口置顶」
+    Tray->>Main: onClick('pin:toggle')
+    Main->>Main: togglePin() → applyLayer({pinned:true})
+    Main->>Win: getNativeWindowHandle() → hwndBuffer
+    Main->>DL: detachFromDesktop(hwndBuffer)
+    DL->>Win32: SetParent(winHwnd, 0)  %% 脱离 WorkerW
+    DL-->>Main: AttachResult{ok:true, mode:'pinned-floating'}
+    Main->>Win: setAlwaysOnTop(true, 'screen-saver')
+    Main->>Win: show() / focus()
+    Main->>Tray: refreshTooltip('GlassMemo · 浮窗置顶') + syncPinCheckbox(true)
+    Main->>PL: send('pin:change', {pinned:true, mode:'pinned-floating'})
+    PL->>R: onChange(state) → UI 高亮置顶
+  end
+
+  %% ===== 场景 3：再次取消勾选 → 回到桌面挂件 =====
+  rect rgb(245, 255, 230)
+    Note over U,Win32: 场景 3：取消勾选 → 回到桌面挂件
+    U->>Tray: 取消「窗口置顶」
+    Tray->>Main: onClick('pin:toggle')
+    Main->>Main: togglePin() → applyLayer({pinned:false})
+    Main->>Win: setAlwaysOnTop(false)
+    Main->>DL: findDesktopWorkerW() + attachToDesktop(hwndBuffer)
+    DL->>Win32: SetParent(winHwnd, workerWHwnd)
+    DL-->>Main: AttachResult{ok:true, mode:'desktop-widget'}
+    Main->>Tray: refreshTooltip('GlassMemo · 桌面挂件') + syncPinCheckbox(false)
+    Main->>PL: send('pin:change', {pinned:false, mode:'desktop-widget'})
+    PL->>R: onChange(state)
+  end
+
+  %% ===== 场景 4：嵌入失败降级 =====
+  rect rgb(255, 230, 230)
+    Note over Main,Win32: 场景 4：嵌入失败 → 降级普通窗口（不崩）
+    Main->>Win: getNativeWindowHandle() → hwndBuffer
+    Main->>DL: attachToDesktop(hwndBuffer)
+    DL->>Win32: FindWindowW('Progman', null) / SetParent(…)
+    Win32-->>DL: SetParent 返回 0 / 抛 DesktopLayerError
+    DL-->>Main: 抛 DesktopLayerError('WorkerW not found' 或 'SetParent failed')
+    Main->>Main: try/catch
+    Main->>DL: detachFromDesktop(hwndBuffer) 兜底
+    Main->>Main: console.error('[desktop-layer] WorkerW not found, fallback to normal window')
+    Main->>Main: lastMode='normal-fallback', pinned=false
+    Main->>Tray: refreshTooltip('桌面挂件不可用：未找到 WorkerW')
+    Main->>PL: send('pin:change', {pinned:false, mode:'normal-fallback'})
+    PL->>R: onChange(state) → UI 正常显示但标记降级
+    Note over Main: 不调用 win.destroy() / app.quit()，AC-9 满足
+  end
+
+  %% ===== 场景 5：渲染进程主动 toggle（UI 按钮） =====
+  rect rgb(230, 230, 255)
+    Note over R,Main: 场景 5：渲染进程点击 UI 按钮（与托盘等价）
+    U->>R: 点击「置顶」按钮
+    R->>PL: window.glassmemo.pin.toggle()
+    PL->>Main: ipcMain.handle('pin:toggle')
+    Main->>Main: applyLayer({pinned: !currentPinned})
+    Main-->>PL: AttachResult
+    PL-->>R: Promise resolve
+  end
+
+  %% ===== 场景 6：诊断脚本 =====
+  rect rgb(245, 245, 245)
+    Note over Diag,Win32: 场景 6：诊断（开发态，非运行时）
+    U->>Diag: node electron/_diag.cjs
+    Diag->>Win32: 枚举 Progman 子窗口
+    Diag->>Win32: 枚举顶层 WorkerW
+    Win32-->>Diag: WindowNode[]
+    Diag-->>U: 打印 hwnd / className / parentHwnd
+    Diag->>Diag: simulateAttachFailure() （人为传 0 验证降级路径）
+  end

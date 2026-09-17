@@ -1,0 +1,168 @@
+%% GlassMemo Orb Mode — Sequence Diagram (增量)
+%% 覆盖 4 个核心场景：
+%%   S1 用户点右上角「缩小」按钮 → shrink → orb 渲染
+%%   S2 用户点悬浮球 → expand → note 渲染
+%%   S3 用户拖动悬浮球 → DragHandler → SnappingPolicy → 持久化
+%%   S4 启动恢复 → 按 lastView 选择 note 或 orb
+%% 与 docs/system_design-orb.md 配套。
+
+sequenceDiagram
+  autonumber
+  participant U as 用户
+  participant SN as StickyNote<br/>(React)
+  participant O as Orb<br/>(React)
+  participant HV as useViewMode<br/>(Hook)
+  participant PL as preload.cjs<br/>(contextBridge)
+  participant MP as main.cjs<br/>(IPC handler)
+  participant OC as OrbController<br/>(主进程)
+  participant DH as DragHandler
+  participant SP as SnappingPolicy
+  participant BR as BoundsRepository
+  participant FS as 文件系统<br/>(userData/*.json)
+  participant W as BrowserWindow
+
+  %% =========================================================
+  %% S1: 用户点右上角「缩小」按钮 → shrink → orb 渲染
+  %% =========================================================
+  rect rgb(240, 248, 255)
+    note over U,W: S1 — 用户点「缩小」按钮：note → orb
+    U->>SN: 点击「缩小」按钮
+    SN->>PL: window.glassmemo.view.toggle('button')
+    PL->>MP: ipcMain.handle('view:toggle')
+    MP->>OC: toggle('button')
+    OC->>OC: 读取 currentView === 'note'
+    OC->>OC: 调用 shrink()
+    OC->>BR: saveNote(currentBounds)
+    BR->>FS: 写 userData/note-bounds.json
+    FS-->>BR: ok
+    OC->>BR: saveLastView('orb')
+    BR->>FS: 写 userData/view-state.json
+    FS-->>BR: ok
+    OC->>W: setMinimumSize(60, 60)
+    OC->>W: setResizable(false)
+    OC->>OC: 计算 orb 目标 bounds<br/>(中心点对齐 60×60 + clamp)
+    OC->>W: setBounds(targetBounds)
+    OC->>MP: webContents.send('view:change', payload)
+    MP->>PL: 推送到渲染进程
+    PL->>HV: onChange 回调
+    HV->>HV: setState({view:'orb', bounds, isAnimating:true})
+    HV->>SN: 触发重渲染
+    SN->>SN: view === 'orb' → 渲染 <Orb />
+    SN->>O: 挂载 Orb 组件
+    O->>O: Motion 12 启动 250ms 缩放过渡
+    O-->>U: 视觉上从便签收缩成 60×60 圆
+    note over HV: 动画结束<br/>setState({isAnimating:false})
+  end
+
+  %% =========================================================
+  %% S2: 用户点悬浮球 → expand → note 渲染
+  %% =========================================================
+  rect rgb(255, 248, 240)
+    note over U,W: S2 — 用户点悬浮球：orb → note
+    U->>O: mousedown → mouseup<br/>(位移 < 4px → 判定为点击)
+    O->>PL: window.glassmemo.view.toggle('orb-click')
+    PL->>MP: ipcMain.handle('view:toggle')
+    MP->>OC: toggle('orb-click')
+    OC->>OC: 读取 currentView === 'orb'
+    OC->>OC: 调用 expand()
+    OC->>BR: saveOrb(currentBounds)
+    BR->>FS: 写 userData/orb-bounds.json
+    FS-->>BR: ok
+    OC->>BR: loadNote()
+    BR->>FS: 读 userData/note-bounds.json
+    FS-->>BR: Bounds
+    BR-->>OC: savedNoteBounds
+    OC->>BR: saveLastView('note')
+    BR->>FS: 写 userData/view-state.json
+    FS-->>BR: ok
+    OC->>W: setMinimumSize(200, 200)
+    OC->>W: setResizable(true)
+    OC->>W: setBounds(savedNoteBounds)
+    OC->>MP: webContents.send('view:change', payload)
+    MP->>PL: 推送到渲染进程
+    PL->>HV: onChange 回调
+    HV->>HV: setState({view:'note', bounds, isAnimating:true})
+    HV->>O: 触发重渲染
+    O-->>SN: Orb 卸载
+    SN->>SN: view === 'note' → 渲染便签 UI
+    SN-->>U: 视觉上从 60×60 圆展开回完整便签
+    note over HV: 动画结束<br/>setState({isAnimating:false})
+  end
+
+  %% =========================================================
+  %% S3: 用户拖动悬浮球 → DragHandler → SnappingPolicy → 持久化
+  %% =========================================================
+  rect rgb(248, 255, 240)
+    note over U,W: S3 — 用户拖动悬浮球
+    U->>O: mousedown (位移开始累积)
+    O->>O: 位移 > 4px → 进入拖动模式
+    O->>PL: window.glassmemo.view.drag({dx,dy,phase:'start'})
+    PL->>MP: ipcMain.handle('view:drag')
+    MP->>DH: onDrag(phase='start')
+    DH->>DH: 记录 startBounds
+
+    loop mousemove 节流 (~16ms)
+      U->>O: mousemove
+      O->>PL: view.drag({dx,dy,phase:'move'})
+      PL->>MP: ipcMain.handle('view:drag')
+      MP->>DH: onDrag(phase='move')
+      DH->>SP: clampToWorkArea(newBounds, workArea)
+      SP-->>DH: clampedBounds
+      DH->>W: setBounds(clampedBounds)
+      W-->>U: 悬浮球视觉跟手
+    end
+
+    U->>O: mouseup
+    O->>PL: view.drag({dx:0,dy:0,phase:'end'})
+    PL->>MP: ipcMain.handle('view:drag')
+    MP->>DH: onDrag(phase='end')
+    DH->>SP: apply(currentBounds, workArea)
+      note right of SP: 距左/右 ≤ 30px → 贴边<br/>中心距边缘 8px
+    SP-->>DH: snappedBounds
+    DH->>W: setBounds(snappedBounds)
+    DH->>BR: saveOrb(snappedBounds)
+    BR->>FS: 写 userData/orb-bounds.json
+    FS-->>BR: ok
+  end
+
+  %% =========================================================
+  %% S4: 启动恢复 → 按 lastView 选择 note 或 orb
+  %% =========================================================
+  rect rgb(255, 240, 248)
+    note over U,W: S4 — 应用启动恢复
+    W->>MP: app.whenReady() + win.once('ready-to-show')
+    MP->>OC: 初始化 OrbController
+    OC->>BR: loadLastView()
+    BR->>FS: 读 userData/view-state.json
+    FS-->>BR: {lastView}
+    BR-->>OC: ViewMode
+
+    alt lastView === 'orb'
+      OC->>BR: loadOrb()
+      BR->>FS: 读 userData/orb-bounds.json
+      FS-->>BR: Bounds (或默认 60×60 居中)
+      BR-->>OC: orbBounds
+      OC->>OC: currentView='orb', currentBounds=orbBounds
+      OC->>W: setMinimumSize(60, 60)
+      OC->>W: setResizable(false)
+      OC->>W: setBounds(orbBounds)
+      OC->>MP: webContents.send('view:change',<br/>{from:'note', to:'orb', isAnimating:false})
+      MP->>PL: 推送
+      PL->>HV: onChange 回调
+      HV->>SN: 渲染 Orb 分支
+    else lastView === 'note'（含首次启动）
+      OC->>BR: loadNote()
+      BR->>FS: 读 userData/note-bounds.json
+      FS-->>BR: Bounds (或默认 360×480 居中)
+      BR-->>OC: noteBounds
+      OC->>OC: currentView='note', currentBounds=noteBounds
+      OC->>W: setMinimumSize(200, 200)
+      OC->>W: setResizable(true)
+      OC->>W: setBounds(noteBounds)
+      note over OC: 继续走基线 applyLayer({pinned:lastPinned})<br/>桌面层嵌入，与 view 维度正交
+      OC->>MP: webContents.send('view:change',<br/>{from:'note', to:'note', isAnimating:false})
+      MP->>PL: 推送
+      PL->>HV: onChange 回调
+      HV->>SN: 渲染便签分支
+    end
+  end

@@ -1,0 +1,16 @@
+<!-- pages/history/history.wxml -->
+<view class="page">
+  <view wx:if="{{list.length === 0}}" class="empty">还没有抽卡记录。去抽一张，开始你的觉察练习。</view>
+
+  <view wx:for="{{list}}" wx:key="cardId" class="item">
+    <view class="item-head">
+      <text class="item-badge" style="color:{{item.card.color}}">{{item.card.symbol}} {{item.card.rank}}</text>
+      <text class="item-time soft">{{item.timeText}}</text>
+    </view>
+    <text class="item-q">{{item.card.question}}</text>
+    <view wx:if="{{item.note}}" class="item-note">
+      <text class="note-label">笔记</text>
+      <text class="note-text">{{item.note}}</text>
+    </view>
+  </view>
+</view>

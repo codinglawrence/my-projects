@@ -1,0 +1,140 @@
+﻿sequenceDiagram
+    actor User as 用户
+    participant KB as 物理键盘
+    participant Browser as 浏览器
+    participant HookMap as useKeyboardMap
+    participant BKB as BubbleKeyboard
+    participant Key as BubbleKey
+    participant Audio as useAudioEngine
+    participant WebAudio as Web Audio API
+    participant Particle as ParticleBurst
+    participant HookDrag as useDragPop
+    participant CSS as CSS Animations
+
+    %% ==================== 流程1: 物理键盘触发爆破 ====================
+    rect rgb(30, 10, 40)
+        Note over User,CSS: 流程1 — 物理键盘触发爆破（keydown → pop → respawn）
+        User->>KB: 敲击 KeyQ
+        KB->>Browser: keydown { code: "KeyQ" }
+        Browser->>HookMap: event.code === "KeyQ"
+        HookMap->>HookMap: activeKeys.has("KeyQ")? 否 → 继续
+        HookMap->>HookMap: codeToKey["KeyQ"] → KeyConfig
+        HookMap->>HookMap: activeKeys.add("KeyQ")
+        HookMap->>BKB: onKeyPop(keyConfig)
+
+        rect rgb(40, 20, 60)
+            Note over BKB,CSS: 爆破处理
+            BKB->>Audio: playPop({ baseFrequency: 4000±20%, duration: 100ms })
+            Audio->>WebAudio: createBufferSource(noiseBuffer)
+            Audio->>WebAudio: createBiquadFilter(bandpass, 2000-8000Hz)
+            Audio->>WebAudio: createGain(exponentialRampToValueAtTime, 0, 100ms)
+            Audio->>WebAudio: source.start(0)
+            WebAudio-->>User: 🔊 "啪" 爆破音
+
+            BKB->>BKB: keysPhase["KeyQ"] = "popping"
+            BKB->>Key: phase → "popping"
+            Key->>CSS: class "bubble-popping" (scale 1→1.3→0, 200ms)
+            CSS-->>User: 👁️ 泡泡爆裂缩放动画
+
+            BKB->>Particle: render <ParticleBurst config={keyId, x, y, color, count:20}>
+            Particle->>Particle: 生成 20 个随机 Particle
+            Particle->>CSS: 20 × @keyframes particleFly (各方向飞溅)
+            CSS-->>User: 👁️ 粒子飞溅 + 渐隐
+
+            Note over BKB: 200ms timeout
+            BKB->>BKB: keysPhase["KeyQ"] = "respawning"
+            BKB->>Key: phase → "respawning"
+            Key->>CSS: class "bubble-respawning" (scale 0→1, opacity 0→1, 1200ms)
+            CSS-->>User: 👁️ 按键缓慢再生
+
+            Note over Particle: 600ms 后 animationend
+            Particle->>BKB: onComplete() → 移除 ParticleBurst
+
+            Note over BKB: 1200ms timeout (再生完成)
+            BKB->>BKB: keysPhase["KeyQ"] = "idle"
+            BKB->>Key: phase → "idle"
+            Key->>CSS: class "bubble-idle" (弹跳动画恢复)
+            CSS-->>User: 👁️ 泡泡恢复弹跳
+
+            BKB->>BKB: popCount++
+        end
+
+        Browser->>Browser: keyup { code: "KeyQ" }
+        Browser->>HookMap: activeKeys.delete("KeyQ")
+    end
+
+    %% ==================== 流程2: 鼠标点击爆破 ====================
+    rect rgb(10, 30, 30)
+        Note over User,CSS: 流程2 — 鼠标点击触发爆破
+        User->>Key: 点击 BubbleKey "KeyW"
+        Key->>Key: phase === "idle"? 是 → 继续
+        Key->>BKB: onPop("KeyW")
+        Note over BKB,CSS: 同流程1 爆破处理（音效 + 动画 + 粒子 + 再生）
+    end
+
+    %% ==================== 流程3: 鼠标拖拽连环爆 ====================
+    rect rgb(40, 30, 10)
+        Note over User,CSS: 流程3 — 鼠标拖拽连环爆
+        User->>Key: mousedown 在 KeyA
+        Key->>BKB: onPop("KeyA") （第一键爆破）
+        Note over BKB: 同流程1 爆破处理
+
+        HookDrag->>HookDrag: isDragging = true
+        HookDrag->>HookDrag: poppedThisDrag = Set{["KeyA"]}
+
+        loop 用户拖动鼠标
+            User->>Browser: mousemove (高频)
+            Browser->>HookDrag: mousemove event
+            HookDrag->>HookDrag: requestAnimationFrame 节流
+            HookDrag->>HookDrag: 遍历 keyElements Map
+            loop 每个按键 getBoundingClientRect
+                HookDrag->>Key: rect = el.getBoundingClientRect()
+                alt 鼠标坐标在 rect 内 AND keyId NOT IN poppedThisDrag
+                    HookDrag->>HookDrag: poppedThisDrag.add(keyId)
+                    HookDrag->>BKB: onPop(keyId) （连环爆）
+                    Note over BKB: 同流程1 爆破处理（音效 + 动画 + 粒子）
+                else 不在范围内或已爆过
+                    Note over HookDrag: 跳过
+                end
+            end
+        end
+
+        User->>Browser: mouseup
+        Browser->>HookDrag: mouseup event
+        HookDrag->>HookDrag: isDragging = false
+        HookDrag->>HookDrag: poppedThisDrag.clear()
+        HookDrag->>HookDrag: 移除全局 mousemove/mouseup 监听
+    end
+
+    %% ==================== 流程4: 初始加载 + AudioContext 初始化 ====================
+    rect rgb(20, 20, 40)
+        Note over User,Audio: 流程4 — 页面加载 & AudioContext 初始化
+        User->>Browser: 打开页面
+        Browser->>BKB: 渲染 49 个 BubbleKey
+        BKB->>CSS: 所有按键开始 bubbleFloat 弹跳（随机相位）
+        CSS-->>User: 👁️ 按键矩阵微微浮动
+
+        User->>Browser: 首次点击/按键
+        Browser->>Audio: 触发 AudioContext 初始化
+        Audio->>WebAudio: new AudioContext()
+        Audio->>Audio: createNoiseBuffer() → 白噪声 AudioBuffer
+        Audio-->>Browser: isReady = true
+        Note over Audio: 后续所有 playPop() 直接合成，零加载
+    end
+
+    %% ==================== 流程5: 防连发逻辑 ====================
+    rect rgb(30, 30, 30)
+        Note over User,HookMap: 流程5 — 按住不放不连发
+        User->>KB: 按住 KeyQ 不放
+        KB->>Browser: keydown "KeyQ"（首次）
+        Browser->>HookMap: 首次 → 触发爆破
+        Note over HookMap: activeKeys.add("KeyQ")
+        KB->>Browser: keydown "KeyQ"（重复，OS 连发）
+        Browser->>HookMap: activeKeys.has("KeyQ")? 是 → 忽略
+        Note over HookMap: 不触发爆破
+
+        User->>KB: 松开 KeyQ
+        KB->>Browser: keyup "KeyQ"
+        Browser->>HookMap: activeKeys.delete("KeyQ")
+        Note over HookMap: 现在可以再次触发该键
+    end

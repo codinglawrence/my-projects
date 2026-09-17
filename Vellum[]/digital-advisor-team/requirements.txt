@@ -1,0 +1,30 @@
+# 核心依赖
+
+# 数据库相关
+sqlalchemy
+asyncpg
+aiosqlite
+
+# 爬虫相关
+playwright
+beautifulsoup4
+lxml
+
+# LLM相关
+openai
+
+# 工具库
+pydantic
+pydantic-settings
+loguru
+python-dotenv
+
+# 开发工具
+pytest
+black
+flake8
+
+# 可选依赖
+uvicorn
+fastapi
+websockets

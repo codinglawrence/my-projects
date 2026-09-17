@@ -1,0 +1,10 @@
+﻿node_modules/
+dist/
+__pycache__/
+.venv/
+.env
+
+# 运行时数据（SQLite 库 + Chroma 向量库），应在容器/挂载卷内生成，不进仓库
+data/
+backend/data
+

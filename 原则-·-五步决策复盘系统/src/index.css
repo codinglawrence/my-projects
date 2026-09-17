@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: "Noto Serif SC", serif;
+    --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-cinzel: "Cinzel", serif;
+    --crimson: #C5221F;
+    --crimson-dark: #991B1B;
+    --paper-bg: #FAF9F6;
+    --paper-card: #FFFFFF;
+    --paper-border: #E8E6DF;
+    --ink-black: #121316;
+    --ink-muted: #575A65;
+  }
+
+  body {
+    background-color: var(--paper-bg);
+    color: var(--ink-black);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+/* Restrained classic paper subtle grid */
+.principles-grid-bg {
+  background-image: radial-gradient(rgba(18, 19, 22, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Elegant scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(18, 19, 22, 0.15);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(197, 34, 31, 0.4);
+}

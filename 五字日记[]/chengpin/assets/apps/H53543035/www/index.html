@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>五字日记</title>
+    <script>
+      // 5+ App 环境检测
+      window.__plus__ = typeof plus !== 'undefined';
+      console.log('[Env] plus available:', window.__plus__);
+      
+      // 测试 localStorage
+      try {
+        localStorage.setItem('__test__', 'ok');
+        var test = localStorage.getItem('__test__');
+        localStorage.removeItem('__test__');
+        console.log('[Storage] Test result:', test === 'ok' ? 'OK' : 'FAILED');
+      } catch(e) {
+        console.error('[Storage] Test error:', e);
+      }
+    </script>
+    <script type="module" crossorigin src="./assets/index-C6Er66kt.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DyekAvzY.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

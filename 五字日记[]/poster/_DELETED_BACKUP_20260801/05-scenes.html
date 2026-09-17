@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<title>五字日记 · 使用场景</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing:antialiased; user-select:none; }
+html, body { width:1080px; height:1440px; overflow:hidden; }
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  background: linear-gradient(165deg, #fff9f2 0%, #ffefe6 35%, #ffe4d6 72%, #ffd6c4 100%);
+  color: #4a3528;
+  position: relative;
+}
+.bg-blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+.blob-1 { width: 440px; height: 440px; background: #ffc8b0; top: -100px; right: -80px; opacity: .34; }
+.blob-2 { width: 400px; height: 400px; background: #ffe0b3; bottom: -100px; left: -80px; opacity: .32; }
+.poster { position: relative; width: 100%; height: 100%; z-index: 1; }
+.header { text-align: center; padding-top: 70px; }
+.header h2 { font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif; font-size: 56px; font-weight: 600; letter-spacing: 6px; color: #4a3528; }
+.header p { font-size: 24px; color: #8b6b55; margin-top: 14px; letter-spacing: 3px; }
+.main { position: relative; width: 1080px; height: 760px; margin-top: 34px; }
+.phone { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 272px; padding: 11px; background: #fff; border-radius: 40px; box-shadow: 0 28px 80px rgba(74, 45, 30, 0.16), 0 10px 24px rgba(74, 45, 30, 0.08); }
+.phone-screen { width: 250px; height: 540px; border-radius: 32px; overflow: hidden; background: #faf8f6; }
+.phone-screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.scene { position: absolute; display: flex; align-items: center; gap: 16px; padding: 22px 26px; border-radius: 24px; background: rgba(255,255,255,0.62); border: 1px solid rgba(200,168,124,0.22); box-shadow: 0 12px 32px rgba(74,45,30,0.06); }
+.scene .emoji { font-size: 40px; line-height: 1; }
+.scene .text h4 { font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif; font-size: 26px; color: #4a3528; letter-spacing: 2px; margin-bottom: 4px; }
+.scene .text p { font-size: 21px; color: #7a5d4a; }
+.s1 { left: 68px; top: 42px; }
+.s2 { right: 60px; top: 92px; }
+.s3 { left: 56px; top: 336px; }
+.s4 { right: 54px; top: 392px; }
+.s5 { left: 50%; bottom: 42px; transform: translateX(-50%); }
+.bottom { text-align: center; margin-top: 40px; }
+.bottom .cta { font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif; font-size: 42px; font-weight: 600; letter-spacing: 3px; color: #4a3528; }
+.bottom .sub { font-size: 22px; color: #9c7b64; margin-top: 10px; letter-spacing: 1px; }
+.bottom .hashtags { font-size: 20px; color: #b08d75; margin-top: 16px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="poster">
+    <div class="header">
+      <h2>这 5 个瞬间，最适合写五字日记</h2>
+      <p>不必等有大段空闲，抓住一个小瞬间</p>
+    </div>
+    <div class="main">
+      <div class="phone"><div class="phone-screen"><img src="../poster-assets/home.png" alt="home"></div></div>
+      <div class="scene s1">
+        <div class="emoji">☀️</div>
+        <div class="text"><h4>清晨醒来</h4><p>阳光很好</p></div>
+      </div>
+      <div class="scene s2">
+        <div class="emoji">🚇</div>
+        <div class="text"><h4>通勤路上</h4><p>今天顺利</p></div>
+      </div>
+      <div class="scene s3">
+        <div class="emoji">☕</div>
+        <div class="text"><h4>午后摸鱼</h4><p>咖啡续命</p></div>
+      </div>
+      <div class="scene s4">
+        <div class="emoji">🌙</div>
+        <div class="text"><h4>深夜加班</h4><p>早点睡觉</p></div>
+      </div>
+      <div class="scene s5">
+        <div class="emoji">🛏️</div>
+        <div class="text"><h4>睡前复盘</h4><p>今天值得</p></div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="cta">抓住一个小瞬间</div>
+      <div class="sub">五个字，不需要仪式</div>
+      <div class="hashtags">#生活记录 &nbsp; #自律 &nbsp; #治愈系</div>
+    </div>
+  </div>
+</body>
+</html>

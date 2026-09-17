@@ -1,0 +1,251 @@
+﻿classDiagram
+    direction TB
+
+    %% ==================== 类型定义 ====================
+
+    class KeyPhase {
+        <<enumeration>>
+        idle
+        popping
+        respawning
+    }
+
+    class KeyConfig {
+        +string id
+        +string code
+        +int row
+        +int col
+        +float width
+        +string color
+        +string? label
+    }
+
+    class Particle {
+        +int id
+        +int x
+        +int y
+        +int dx
+        +int dy
+        +int size
+        +string color
+        +int duration
+        +string shape
+    }
+
+    class ParticleBurstConfig {
+        +string keyId
+        +int x
+        +int y
+        +string color
+        +int count
+    }
+
+    class PopSoundConfig {
+        +int baseFrequency
+        +float frequencyVariation
+        +int duration
+        +float pitchMultiplier
+    }
+
+    class KeyboardLayout {
+        +KeyConfig[][] rows
+        +Record~string, KeyConfig~ codeToKey
+    }
+
+    %% ==================== 组件 ====================
+
+    class App {
+        +popCount: number
+        +showHint: boolean
+        --
+        +render()
+    }
+
+    class BubbleKeyboard {
+        -keysPhase: Record~string, KeyPhase~
+        -particleBursts: ParticleBurstConfig[]
+        -popCount: number
+        -audioEngine: AudioEngine
+        -keyRefs: Map~string, HTMLDivElement~
+        --
+        +handlePop(keyId: string): void
+        +handlePopWithPosition(keyId: string, rect: DOMRect): void
+        +handleParticleComplete(keyId: string): void
+        +render()
+    }
+
+    class BubbleKey {
+        -phase: KeyPhase
+        -config: KeyConfig
+        -bouncePhase: number
+        --
+        +props: BubbleKeyProps
+        +handleClick(): void
+        +ref: HTMLDivElement
+        +render()
+    }
+
+    class ParticleBurst {
+        -particles: Particle[]
+        -config: ParticleBurstConfig
+        --
+        +props: ParticleBurstProps
+        +generateParticles(): Particle[]
+        +handleAnimationEnd(particleId: number): void
+        +render()
+    }
+
+    class PopCounter {
+        +props: PopCounterProps
+        +render()
+    }
+
+    class KeyboardHint {
+        +props: KeyboardHintProps
+        +render()
+    }
+
+    %% ==================== Hooks ====================
+
+    class useAudioEngine {
+        -context: AudioContext?
+        -noiseBuffer: AudioBuffer?
+        -comboCount: number
+        -lastPopTime: number
+        -isReady: boolean
+        --
+        +initialize(): void
+        +playPop(config?: PopSoundConfig): void
+        -createNoiseBuffer(): AudioBuffer
+        -playSound(config: PopSoundConfig): void
+    }
+
+    class useKeyboardMap {
+        -activeKeys: Set~string~
+        -codeToKey: Record~string, KeyConfig~
+        --
+        +handleKeyDown(event: KeyboardEvent): void
+        +handleKeyUp(event: KeyboardEvent): void
+        +isModifierKey(code: string): boolean
+    }
+
+    class useDragPop {
+        -isDragging: boolean
+        -poppedThisDrag: Set~string~
+        -containerRef: RefObject
+        -keyElements: Map
+        -rafId: number
+        --
+        +handleMouseDown(event: MouseEvent): void
+        +handleMouseMove(event: MouseEvent): void
+        +handleMouseUp(): void
+        +checkCollision(clientX: int, clientY: int): string?
+        +cleanup(): void
+    }
+
+    %% ==================== 工具函数 ====================
+
+    class AudioUtils {
+        <<utility>>
+        +createNoiseBuffer(ctx: AudioContext, duration?: float): AudioBuffer
+        +playPopSound(ctx: AudioContext, buffer: AudioBuffer, config: PopSoundConfig): void
+        +getRandomColor(): string
+    }
+
+    %% ==================== 配置 ====================
+
+    class KeyboardConfig {
+        <<static>>
+        +ROWS: KeyConfig[][]
+        +CODE_TO_KEY: Record~string, KeyConfig~
+        +ROW_OFFSETS: int[]
+        +COLORS: string[]
+        +KEY_WIDTH_MAP: Record~string, float~
+    }
+
+    %% ==================== Props 接口 ====================
+
+    class BubbleKeyProps {
+        <<interface>>
+        +config: KeyConfig
+        +onPop: (keyId: string) => void
+        +onPopPosition: (rect: DOMRect) => void
+    }
+
+    class ParticleBurstProps {
+        <<interface>>
+        +config: ParticleBurstConfig
+        +onComplete: () => void
+    }
+
+    class PopCounterProps {
+        <<interface>>
+        +count: number
+    }
+
+    class KeyboardHintProps {
+        <<interface>>
+        +onDismiss: () => void
+    }
+
+    %% ==================== 关系 ====================
+
+    App --> BubbleKeyboard : "renders"
+    App --> PopCounter : "renders"
+    App --> KeyboardHint : "renders"
+    App --> useAudioEngine : "uses"
+
+    BubbleKeyboard --> BubbleKey : "renders × N"
+    BubbleKeyboard --> ParticleBurst : "renders × N"
+    BubbleKeyboard --> useKeyboardMap : "uses"
+    BubbleKeyboard --> useDragPop : "uses"
+
+    BubbleKey ..|> BubbleKeyProps : "implements"
+    ParticleBurst ..|> ParticleBurstProps : "implements"
+    PopCounter ..|> PopCounterProps : "implements"
+    KeyboardHint ..|> KeyboardHintProps : "implements"
+
+    BubbleKey --> KeyConfig : "config"
+    BubbleKey --> KeyPhase : "phase"
+
+    ParticleBurst --> ParticleBurstConfig : "config"
+    ParticleBurst --> Particle : "generates"
+
+    useAudioEngine --> PopSoundConfig : "config"
+    useAudioEngine --> AudioUtils : "calls"
+
+    useKeyboardMap --> KeyConfig : "looks up"
+    useKeyboardMap --> KeyboardConfig : "reads"
+
+    useDragPop --> BubbleKey : "refs"
+
+    KeyboardConfig --> KeyConfig : "defines"
+    KeyboardConfig --> KeyboardLayout : "implements"
+
+    %% ==================== 样式 ====================
+
+    style KeyPhase fill:#e6f7ff,stroke:#1890ff
+    style KeyConfig fill:#e6f7ff,stroke:#1890ff
+    style Particle fill:#e6f7ff,stroke:#1890ff
+    style ParticleBurstConfig fill:#e6f7ff,stroke:#1890ff
+    style PopSoundConfig fill:#e6f7ff,stroke:#1890ff
+    style KeyboardLayout fill:#e6f7ff,stroke:#1890ff
+
+    style App fill:#f6ffed,stroke:#52c41a
+    style BubbleKeyboard fill:#f6ffed,stroke:#52c41a
+    style BubbleKey fill:#f6ffed,stroke:#52c41a
+    style ParticleBurst fill:#f6ffed,stroke:#52c41a
+    style PopCounter fill:#f6ffed,stroke:#52c41a
+    style KeyboardHint fill:#f6ffed,stroke:#52c41a
+
+    style useAudioEngine fill:#fff7e6,stroke:#fa8c16
+    style useKeyboardMap fill:#fff7e6,stroke:#fa8c16
+    style useDragPop fill:#fff7e6,stroke:#fa8c16
+
+    style AudioUtils fill:#f0f0f0,stroke:#8c8c8c
+    style KeyboardConfig fill:#f0f0f0,stroke:#8c8c8c
+
+    style BubbleKeyProps fill:#fff0f6,stroke:#eb2f96
+    style ParticleBurstProps fill:#fff0f6,stroke:#eb2f96
+    style PopCounterProps fill:#fff0f6,stroke:#eb2f96
+    style KeyboardHintProps fill:#fff0f6,stroke:#eb2f96

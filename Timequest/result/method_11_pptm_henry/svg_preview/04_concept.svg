@@ -1,0 +1,55 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1242" height="1660" viewBox="0 0 1242 1660">
+  <rect width="1242" height="1660" fill="#F5EFE0"/>
+  
+  <!-- Chapter watermark -->
+  <text x="621" y="450" font-family="Noto Serif SC, Songti SC, serif" font-size="200" font-weight="700" fill="#C4B8A8" text-anchor="middle" opacity="0.2">04</text>
+  
+  <!-- Eyebrow -->
+  <text x="100" y="160" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="16" font-weight="400" fill="#8C7B6E" letter-spacing="8">CORE CONCEPT</text>
+  
+  <!-- Section heading -->
+  <text x="100" y="260" font-family="Noto Serif SC, Songti SC, serif" font-size="64" font-weight="700" fill="#2C1810">时间负债</text>
+  
+  <!-- Rule -->
+  <line x1="100" y1="290" x2="260" y2="290" stroke="#B4643C" stroke-width="2"/>
+  
+  <!-- Sub-lead -->
+  <text x="100" y="360" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="400" fill="#8C7B6E">每一分钟的浪费，都是未来的负债。量化你的时间资产。</text>
+  
+  <!-- Comparison blocks -->
+  <!-- Effective Time (left) -->
+  <rect x="100" y="440" width="496" height="400" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <!-- Green indicator bar -->
+  <rect x="100" y="440" width="496" height="6" fill="#8B9A6B"/>
+  <text x="348" y="560" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="80" font-weight="300" fill="#5C6B4C" text-anchor="middle">4.5h</text>
+  <text x="348" y="620" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="24" font-weight="400" fill="#8C7B6E" text-anchor="middle">有效时间</text>
+  <text x="348" y="680" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#C4B8A8" text-anchor="middle">
+    <tspan x="348" dy="0">专注工作 · 深度学习</tspan>
+    <tspan x="348" dy="24">创造性产出 · 技能提升</tspan>
+  </text>
+  
+  <!-- VS Divider -->
+  <text x="621" y="640" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="24" font-weight="400" fill="#D4C8B4" text-anchor="middle">VS</text>
+  
+  <!-- Wasted Time (right) -->
+  <rect x="646" y="440" width="496" height="400" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <!-- Red indicator bar -->
+  <rect x="646" y="440" width="496" height="6" fill="#C47A6B"/>
+  <text x="894" y="560" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="80" font-weight="300" fill="#8B4C3C" text-anchor="middle">3.5h</text>
+  <text x="894" y="620" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="24" font-weight="400" fill="#8C7B6E" text-anchor="middle">浪费 / 负债</text>
+  <text x="894" y="680" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#C4B8A8" text-anchor="middle">
+    <tspan x="894" dy="0">拖延 · 切换成本</tspan>
+    <tspan x="894" dy="24">碎片化 · 无效社交</tspan>
+  </text>
+  
+  <!-- Formula box -->
+  <rect x="200" y="920" width="842" height="120" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="621" y="970" font-family="Noto Serif SC, Songti SC, serif" font-size="28" font-weight="400" fill="#2C1810" text-anchor="middle">负债率 = 浪费时长 / 总时长 × 100%</text>
+  <text x="621" y="1010" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#8C7B6E" text-anchor="middle">时间资产管理的第一性原理</text>
+  
+  <!-- Insight text -->
+  <text x="621" y="1180" font-family="Noto Serif SC, Songti SC, serif" font-size="32" font-weight="400" fill="#2C1810" text-anchor="middle" font-style="italic">看见负债，才能偿还</text>
+  
+  <!-- Page number -->
+  <text x="1142" y="1600" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#C4B8A8" text-anchor="end">04 / 05</text>
+</svg>

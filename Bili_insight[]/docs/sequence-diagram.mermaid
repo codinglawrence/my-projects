@@ -1,0 +1,65 @@
+sequenceDiagram
+    participant U as 用户
+    participant E as Electron Main
+    participant BL as backend-launcher.js
+    participant BE as backend.exe (Flask)
+    participant W as BrowserWindow
+    participant F as React 前端
+
+    title 启动：Electron 拉起后端并加载前端
+    U->>E: 双击 BiliInsight.exe
+    E->>BL: 解析 backend.exe 路径并启动
+    BL->>BE: spawn 子进程 (127.0.0.1:5000, 日志走 pipe)
+    BE-->>BL: stdout/stderr 日志流
+    BL->>BE: 轮询 GET /api/test 直至返回 200
+    BL-->>E: 端口就绪
+    BL-->>W: webContents.send('backend:log', line) 透传日志
+    E->>W: loadFile(desktop/app/dist/index.html)
+    W->>F: 渲染 React 应用
+    F->>BE: GET /api/test 自检
+
+---
+
+sequenceDiagram
+    participant F as React 前端
+    participant BE as Flask 后端
+    participant TM as TaskManager
+    participant C as BilibiliUpCrawler
+    participant K as KeyProvider
+
+    title 提炼：异步任务 + 真实进度轮询
+    F->>BE: POST /api/extract {uid, max_videos, model_type}
+    BE->>K: resolve(provider) → 设置key 或 config 默认
+    K-->>BE: api_keys
+    BE->>TM: create() + 起后台线程
+    TM-->>F: {task_id, status:pending}
+    BE->>C: 后台线程 run()，注入 progress_callback
+    loop 每个视频
+        C->>C: process_video()
+        C->>TM: update_progress(stage, processed, total, title)
+    end
+    C-->>TM: finish(results, summary)
+    F->>BE: GET /api/task/<id>/status (每 ~1s 轮询)
+    BE-->>F: {processed, total, current_title, status}
+    F->>BE: GET /api/task/<id>/result (status=done)
+    BE-->>F: {results, overall_summary}
+    F->>BE: POST /api/history (保存本次会话)
+
+---
+
+sequenceDiagram
+    participant F as React 设置面板
+    participant IPC as preload.js
+    participant E as Electron Main
+    participant BE as Flask 后端
+    participant K as KeyProvider
+    participant S as SettingsStore
+
+    title 设置保存：key 永不明文回流前端
+    F->>IPC: invoke('settings:save', {provider, api_key, ...})
+    IPC->>E: ipcRenderer → ipcMain
+    E->>BE: POST /api/settings {provider, api_key, temperature, ...}
+    BE->>K: set(provider, api_key) → 系统凭据/加密文件
+    BE->>S: save(prefs JSON)
+    BE-->>E: {ok}
+    E-->>F: 成功 toast（不回传 key 原文）

@@ -1,0 +1,6 @@
+{
+  "name": "天纪命理决策系统",
+  "description": "深度整合倪海厦《天纪》易学数理算法、紫微斗数排盘推演、阳宅风水九宫评估与四化流年运势的智能决策分析系统。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

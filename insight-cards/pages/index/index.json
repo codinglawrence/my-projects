@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "flip-card": "/components/flip-card/flip-card",
+    "drum-carousel": "/components/drum-carousel/drum-carousel"
+  },
+  "navigationBarTitleText": "抽卡"
+}

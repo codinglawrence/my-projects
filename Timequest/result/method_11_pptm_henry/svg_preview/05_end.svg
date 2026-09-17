@@ -1,0 +1,62 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1242" height="1660" viewBox="0 0 1242 1660">
+  <rect width="1242" height="1660" fill="#F5EFE0"/>
+  
+  <!-- Double rule frame top -->
+  <line x1="100" y1="120" x2="1142" y2="120" stroke="#B4643C" stroke-width="2"/>
+  <line x1="100" y1="128" x2="1142" y2="128" stroke="#B4643C" stroke-width="1"/>
+  
+  <!-- Double rule frame bottom -->
+  <line x1="100" y1="1540" x2="1142" y2="1540" stroke="#B4643C" stroke-width="1"/>
+  <line x1="100" y1="1548" x2="1142" y2="1548" stroke="#B4643C" stroke-width="2"/>
+  
+  <!-- Corner brackets -->
+  <line x1="100" y1="120" x2="100" y2="180" stroke="#B4643C" stroke-width="2"/>
+  <line x1="100" y1="120" x2="160" y2="120" stroke="#B4643C" stroke-width="2"/>
+  <line x1="1142" y1="120" x2="1142" y2="180" stroke="#B4643C" stroke-width="2"/>
+  <line x1="1142" y1="120" x2="1082" y2="120" stroke="#B4643C" stroke-width="2"/>
+  <line x1="100" y1="1548" x2="100" y2="1488" stroke="#B4643C" stroke-width="2"/>
+  <line x1="100" y1="1548" x2="160" y2="1548" stroke="#B4643C" stroke-width="2"/>
+  <line x1="1142" y1="1548" x2="1142" y2="1488" stroke="#B4643C" stroke-width="2"/>
+  <line x1="1142" y1="1548" x2="1082" y2="1548" stroke="#B4643C" stroke-width="2"/>
+  
+  <!-- Chapter watermark -->
+  <text x="621" y="750" font-family="Noto Serif SC, Songti SC, serif" font-size="200" font-weight="700" fill="#C4B8A8" text-anchor="middle" opacity="0.25">05</text>
+  
+  <!-- Eyebrow -->
+  <text x="621" y="420" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="18" font-weight="400" fill="#8C7B6E" text-anchor="middle" letter-spacing="8">GET STARTED</text>
+  
+  <!-- Rule line -->
+  <line x1="521" y1="450" x2="721" y2="450" stroke="#B4643C" stroke-width="1"/>
+  
+  <!-- Main heading -->
+  <text x="621" y="640" font-family="Noto Serif SC, Songti SC, serif" font-size="72" font-weight="700" fill="#2C1810" text-anchor="middle">开始追踪你的时间</text>
+  
+  <!-- CTA button -->
+  <rect x="471" y="720" width="300" height="60" fill="none" stroke="#B4643C" stroke-width="2"/>
+  <text x="621" y="758" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#B4643C" text-anchor="middle" letter-spacing="4">即将上线</text>
+  
+  <!-- Divider -->
+  <line x1="350" y1="860" x2="892" y2="860" stroke="#D4C8B4" stroke-width="1"/>
+  
+  <!-- Info -->
+  <text x="621" y="940" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#8C7B6E" text-anchor="middle">
+    <tspan x="621" dy="0">开源协议 MIT · GitHub @codinglawrence</tspan>
+    <tspan x="621" dy="36">iOS 12+ · Android 8.0+ · 微信小程序</tspan>
+  </text>
+  
+  <!-- Tech badges -->
+  <rect x="311" y="1020" width="120" height="40" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="371" y="1046" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#8C7B6E" text-anchor="middle">Vue 3</text>
+  
+  <rect x="451" y="1020" width="140" height="40" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="521" y="1046" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#8C7B6E" text-anchor="middle">TypeScript</text>
+  
+  <rect x="611" y="1020" width="120" height="40" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="671" y="1046" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#8C7B6E" text-anchor="middle">UniApp</text>
+  
+  <rect x="751" y="1020" width="100" height="40" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="801" y="1046" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#8C7B6E" text-anchor="middle">Vite</text>
+  
+  <!-- Page number -->
+  <text x="1142" y="1600" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#C4B8A8" text-anchor="end">05 / 05</text>
+</svg>

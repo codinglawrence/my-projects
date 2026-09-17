@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字顾问笔记</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- 呼吸背景 -->
+    <div class="breathing-bg"></div>
+
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-inner">
+            <!-- Logo -->
+            <div class="sidebar-header">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="切换侧边栏">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                </button>
+                <span class="logo-text">顾问笔记</span>
+            </div>
+
+            <!-- 导航 -->
+            <nav class="sidebar-nav">
+                <a href="#advisors" class="nav-item active" data-section="advisors">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">顾问团</span>
+                    <span class="nav-line"></span>
+                </a>
+                <a href="#chat" class="nav-item" data-section="chat">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">对话</span>
+                    <span class="nav-line"></span>
+                </a>
+                <a href="#knowledge" class="nav-item" data-section="knowledge">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">知识库</span>
+                    <span class="nav-line"></span>
+                </a>
+            </nav>
+
+            <!-- 底部信息 -->
+            <div class="sidebar-footer">
+                <div class="companion-timer">
+                    <span class="timer-label">陪伴时长</span>
+                    <span class="timer-value" id="companionTime">0m 0s</span>
+                </div>
+                <svg class="footer-signature" viewBox="0 0 120 30" fill="none">
+                    <path class="signature-path" d="M5 20C25 15 45 10 65 18C85 26 95 15 115 20" 
+                          stroke="currentColor" stroke-width="1" stroke-linecap="round" fill="none"/>
+                </svg>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- Hero 区 -->
+        <section class="hero" id="hero">
+            <div class="hero-content">
+                <div class="hero-meta">
+                    <span class="hero-tag">私人笔记本</span>
+                    <span class="hero-date" id="currentDate"></span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="title-line">你的</span>
+                    <span class="title-line accent">数字顾问团</span>
+                </h1>
+                <p class="hero-desc">
+                    将喜爱的博主智慧珍藏于此，随时翻开，与他们深度对话。
+                </p>
+                <div class="hero-actions">
+                    <a href="#advisors" class="btn-primary">
+                        <span>开始探索</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="floating-card" style="--delay: 0s;">
+                    <div class="card-dot" style="background: #2A6F7A;"></div>
+                    <span>科技洞察</span>
+                </div>
+                <div class="floating-card" style="--delay: 2s;">
+                    <div class="card-dot" style="background: #8B6E4E;"></div>
+                    <span>生活哲学</span>
+                </div>
+                <div class="floating-card" style="--delay: 4s;">
+                    <div class="card-dot" style="background: #6B7B8C;"></div>
+                    <span>投资思考</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 顾问列表 -->
+        <section class="section" id="advisors">
+            <header class="section-header">
+                <div class="section-meta">
+                    <span class="section-number">01</span>
+                    <div class="section-line"></div>
+                </div>
+                <h2 class="section-title">我的顾问</h2>
+                <p class="section-subtitle">选择一位，开始对话</p>
+            </header>
+            <div class="advisors-grid" id="advisorsList">
+                <!-- 动态生成 -->
+            </div>
+            <button class="add-advisor-btn" onclick="showAddAdvisorModal()">
+                <span class="btn-icon">+</span>
+                <span>添加顾问</span>
+            </button>
+        </section>
+
+        <!-- 对话区 -->
+        <section class="section chat-section" id="chat">
+            <header class="section-header">
+                <div class="section-meta">
+                    <span class="section-number">02</span>
+                    <div class="section-line"></div>
+                </div>
+                <h2 class="section-title">对话</h2>
+                <p class="section-subtitle" id="chatSubtitle">记录每一次思考</p>
+            </header>
+            <div class="chat-container">
+                <aside class="chat-sidebar">
+                    <div class="sidebar-header">
+                        <span class="sidebar-title">历史记录</span>
+                        <button class="icon-btn" onclick="startNewChat()" title="新建对话">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="conversation-list" id="conversationList">
+                        <!-- 动态生成 -->
+                    </div>
+                </aside>
+                <div class="chat-main">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
+                            <p class="empty-title">开始一段对话</p>
+                            <p class="empty-desc">选择一位顾问，提出你的问题</p>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <div class="input-wrapper">
+                            <textarea class="chat-input" id="messageInput" placeholder="写下你的问题..." rows="1"></textarea>
+                            <button class="send-btn" onclick="sendMessage()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"/>
+                                    <polygon points="22 2 15 22 11 13 2 9"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 知识库 -->
+        <section class="section" id="knowledge">
+            <header class="section-header">
+                <div class="section-meta">
+                    <span class="section-number">03</span>
+                    <div class="section-line"></div>
+                </div>
+                <h2 class="section-title">知识库</h2>
+                <p class="section-subtitle" id="knowledgeSubtitle">请先选择一位顾问</p>
+            </header>
+            <div id="knowledgeContent" style="display: none;">
+                <div class="knowledge-tabs">
+                    <button class="tab-btn active" data-tab="materials">
+                        <span>材料</span>
+                    </button>
+                    <button class="tab-btn" data-tab="crawler">
+                        <span>采集</span>
+                    </button>
+                </div>
+                <div class="tab-content active" id="materialsTab">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-content">
+                            <svg class="upload-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p class="upload-text">拖拽文件至此，或点击上传</p>
+                            <span class="upload-hint">PDF · TXT · Markdown</span>
+                        </div>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.txt,.md" hidden>
+                    </div>
+                    <div class="materials-list" id="materialsList">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                <div class="tab-content" id="crawlerTab">
+                    <div class="crawler-form">
+                        <div class="form-group">
+                            <label class="form-label">网址</label>
+                            <input type="url" class="form-input" id="crawlerUrl" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">模式</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="crawlerMode" value="single" checked>
+                                    <span class="radio-check"></span>
+                                    <span>单篇</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="crawlerMode" value="list">
+                                    <span class="radio-check"></span>
+                                    <span>列表</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn-primary" onclick="startCrawling()">
+                            <span>开始采集</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="knowledgeEmpty" class="empty-state" style="padding: 48px 0;">
+                <div class="empty-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <p class="empty-title">未选择顾问</p>
+                <p class="empty-desc">请先选择一位顾问，查看其专属知识库</p>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p class="footer-text">精心记录，慢慢思考</p>
+        </footer>
+    </main>
+
+    <!-- 添加顾问弹窗 -->
+    <div class="modal" id="addAdvisorModal">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">添加顾问</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">名称</label>
+                    <input type="text" class="form-input" id="advisorName" placeholder="例如：科技博主小王">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">描述</label>
+                    <input type="text" class="form-input" id="advisorDesc" placeholder="简短描述风格特点">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">标记颜色</label>
+                    <div class="color-picker">
+                        <button class="color-dot active" style="--color: #2A6F7A;" data-color="#2A6F7A"></button>
+                        <button class="color-dot" style="--color: #8B6E4E;" data-color="#8B6E4E"></button>
+                        <button class="color-dot" style="--color: #6B7B8C;" data-color="#6B7B8C"></button>
+                        <button class="color-dot" style="--color: #7A6B8A;" data-color="#7A6B8A"></button>
+                        <button class="color-dot" style="--color: #5A7A6B;" data-color="#5A7A6B"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-text" onclick="closeModal()">取消</button>
+                <button class="btn-primary" onclick="addAdvisor()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/collection/collection",
+    "pages/history/history"
+  ],
+  "window": {
+    "backgroundColor": "#FBF7F0",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FBF7F0",
+    "navigationBarTitleText": "照见卡牌",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#9A9388",
+    "selectedColor": "#C9855B",
+    "backgroundColor": "#FBF7F0",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "抽卡" },
+      { "pagePath": "pages/collection/collection", "text": "收藏" },
+      { "pagePath": "pages/history/history", "text": "历史" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

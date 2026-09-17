@@ -1,0 +1,35 @@
+<!-- components/drum-carousel/drum-carousel.wxml -->
+<!-- 滚筒式 3D 卡牌轮播：整体略倾斜；
+     手指跟手拖拽圆柱滚动（松手吸附最近卡），点按任意卡牌 emit select 进入放大详情（由父页处理）。
+     注意：滚筒卡牌处于 3D 旋转中，不叠加重力倾角（避免视觉混乱）；但恢复真实箔纹理层。
+     箔层由 item.foilLayers（按 card.rarity）驱动，wx:for 渲染于 dc-img(z1) 与 dc-img-fg(z4) 之间。
+     纹理 <image> 的 dataUri 来自 data/textures.js 的 getTexture，绝不内联 base64、绝不挂 mix-blend。 -->
+<view class="drum-stage"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd">
+  <view class="drum {{dragging ? 'dragging' : ''}}"
+        style="transform:{{drumStyle}}">
+      <view class="drum-card {{item.index === current ? 'is-current' : ''}} {{item.clipClass}}"
+          wx:for="{{cardsView}}" wx:key="index"
+          style="transform:rotateY({{item.step}}deg) translateZ({{radius}}rpx);"
+          data-index="{{index}}"
+          catchtap="onCardTap">
+      <image class="dc-img" src="{{item.card.artFrontBg}}" mode="aspectFill" />
+      <block wx:for="{{item.foilLayers}}" wx:key="z">
+        <view wx:if="{{!item.isImage}}" class="dc-layer dc-foil-layer {{item.anim}}"
+              style="background-image:{{item.gradient}};opacity:{{item.opacity}};mix-blend-mode:{{item.blend}};z-index:{{item.z}}"></view>
+        <image wx:else class="dc-layer dc-holo-layer {{item.anim}}"
+               src="{{item.src}}" mode="aspectFill"
+               style="opacity:{{item.opacity}};z-index:{{item.z}}"></image>
+      </block>
+      <image class="dc-img-fg" src="{{item.card.artFrontFg}}" mode="aspectFill" />
+      <view class="dc-dim" wx:if="{{item.index !== current}}"></view>
+    </view>
+  </view>
+
+  <view class="drum-dots">
+    <view class="dot {{index === current ? 'on' : ''}}" wx:for="{{cardsView}}" wx:key="index"></view>
+  </view>
+  <view class="drum-hint">左右滑动切换 · 点按卡片放大 · 点空白处返回</view>
+</view>

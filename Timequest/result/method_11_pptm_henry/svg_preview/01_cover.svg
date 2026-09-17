@@ -1,0 +1,59 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1242" height="1660" viewBox="0 0 1242 1660">
+  <rect width="1242" height="1660" fill="#F5EFE0"/>
+  
+  <!-- Double rule frame top -->
+  <line x1="100" y1="120" x2="1142" y2="120" stroke="#B4643C" stroke-width="2"/>
+  <line x1="100" y1="128" x2="1142" y2="128" stroke="#B4643C" stroke-width="1"/>
+  
+  <!-- Double rule frame bottom -->
+  <line x1="100" y1="1540" x2="1142" y2="1540" stroke="#B4643C" stroke-width="1"/>
+  <line x1="100" y1="1548" x2="1142" y2="1548" stroke="#B4643C" stroke-width="2"/>
+  
+  <!-- Corner brackets -->
+  <!-- Top-left -->
+  <line x1="100" y1="120" x2="100" y2="180" stroke="#B4643C" stroke-width="2"/>
+  <line x1="100" y1="120" x2="160" y2="120" stroke="#B4643C" stroke-width="2"/>
+  <!-- Top-right -->
+  <line x1="1142" y1="120" x2="1142" y2="180" stroke="#B4643C" stroke-width="2"/>
+  <line x1="1142" y1="120" x2="1082" y2="120" stroke="#B4643C" stroke-width="2"/>
+  <!-- Bottom-left -->
+  <line x1="100" y1="1548" x2="100" y2="1488" stroke="#B4643C" stroke-width="2"/>
+  <line x1="100" y1="1548" x2="160" y2="1548" stroke="#B4643C" stroke-width="2"/>
+  <!-- Bottom-right -->
+  <line x1="1142" y1="1548" x2="1142" y2="1488" stroke="#B4643C" stroke-width="2"/>
+  <line x1="1142" y1="1548" x2="1082" y2="1548" stroke="#B4643C" stroke-width="2"/>
+  
+  <!-- Chapter watermark -->
+  <text x="621" y="800" font-family="Noto Serif SC, Songti SC, serif" font-size="200" font-weight="700" fill="#C4B8A8" text-anchor="middle" opacity="0.3">01</text>
+  
+  <!-- Eyebrow -->
+  <text x="621" y="420" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="18" font-weight="400" fill="#8C7B6E" text-anchor="middle" letter-spacing="8">TIME MANAGEMENT APP</text>
+  
+  <!-- Rule line -->
+  <line x1="521" y1="450" x2="721" y2="450" stroke="#B4643C" stroke-width="1"/>
+  
+  <!-- Main title -->
+  <text x="621" y="650" font-family="Noto Serif SC, Songti SC, serif" font-size="120" font-weight="700" fill="#2C1810" text-anchor="middle">TIMEQUEST</text>
+  
+  <!-- Subtitle -->
+  <text x="621" y="740" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="400" fill="#B4643C" text-anchor="middle" letter-spacing="16">时间负债管理工具</text>
+  
+  <!-- Rule line -->
+  <line x1="481" y1="780" x2="761" y2="780" stroke="#D4C8B4" stroke-width="1"/>
+  
+  <!-- Description -->
+  <text x="621" y="850" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="24" font-weight="400" fill="#8C7B6E" text-anchor="middle" letter-spacing="4">追踪 · 分类 · 分析 · 优化</text>
+  <text x="621" y="900" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#C4B8A8" text-anchor="middle">基于时间负债概念的量化时间资产管理</text>
+  
+  <!-- Bottom specs -->
+  <text x="621" y="1300" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#8C7B6E" text-anchor="middle">
+    <tspan x="421" dy="0">&lt;2s 启动速度</tspan>
+    <tspan dx="60">·</tspan>
+    <tspan dx="60">1s 计时精度</tspan>
+    <tspan dx="60">·</tspan>
+    <tspan dx="60">MIT 开源协议</tspan>
+  </text>
+  
+  <!-- Page number -->
+  <text x="1142" y="1600" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#C4B8A8" text-anchor="end">01 / 05</text>
+</svg>

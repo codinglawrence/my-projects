@@ -1,0 +1,57 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1242" height="1660" viewBox="0 0 1242 1660">
+  <rect width="1242" height="1660" fill="#F5EFE0"/>
+  
+  <!-- Chapter watermark -->
+  <text x="621" y="450" font-family="Noto Serif SC, Songti SC, serif" font-size="200" font-weight="700" fill="#C4B8A8" text-anchor="middle" opacity="0.2">03</text>
+  
+  <!-- Eyebrow -->
+  <text x="100" y="160" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="16" font-weight="400" fill="#8C7B6E" letter-spacing="8">CORE FEATURES</text>
+  
+  <!-- Section heading -->
+  <text x="100" y="260" font-family="Noto Serif SC, Songti SC, serif" font-size="64" font-weight="700" fill="#2C1810">
+    五大<tspan fill="#B4643C">核心</tspan>功能
+  </text>
+  
+  <!-- Rule -->
+  <line x1="100" y1="290" x2="280" y2="290" stroke="#B4643C" stroke-width="2"/>
+  
+  <!-- Feature cards - vertical list -->
+  <!-- Feature 1 -->
+  <rect x="100" y="370" width="1042" height="180" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="160" y="435" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="28" font-weight="700" fill="#B4643C">01</text>
+  <text x="230" y="435" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700" fill="#2C1810">实时追踪</text>
+  <text x="230" y="480" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#8C7B6E">一键开始计时，精确到秒，后台持续运行不中断。让追踪像呼吸一样自然。</text>
+  <!-- Right indicator -->
+  <circle cx="1102" cy="460" r="4" fill="#B4643C"/>
+  
+  <!-- Feature 2 -->
+  <rect x="100" y="580" width="1042" height="180" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="160" y="645" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="28" font-weight="700" fill="#B4643C">02</text>
+  <text x="230" y="645" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700" fill="#2C1810">分类管理</text>
+  <text x="230" y="690" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#8C7B6E">自定义时间类别，工作 / 学习 / 娱乐一目了然。你的时间你做主。</text>
+  <circle cx="1102" cy="670" r="4" fill="#B4643C"/>
+  
+  <!-- Feature 3 -->
+  <rect x="100" y="790" width="1042" height="180" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="160" y="855" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="28" font-weight="700" fill="#B4643C">03</text>
+  <text x="230" y="855" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700" fill="#2C1810">历史记录</text>
+  <text x="230" y="900" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#8C7B6E">按天 / 周 / 月回溯所有时间记录，支持搜索筛选。再也不会忘记。</text>
+  <circle cx="1102" cy="880" r="4" fill="#B4643C"/>
+  
+  <!-- Feature 4 -->
+  <rect x="100" y="1000" width="1042" height="180" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="160" y="1065" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="28" font-weight="700" fill="#B4643C">04</text>
+  <text x="230" y="1065" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700" fill="#2C1810">统计分析</text>
+  <text x="230" y="1110" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#8C7B6E">可视化图表展示时间分布，发现隐藏的时间黑洞。数据不说谎。</text>
+  <circle cx="1102" cy="1090" r="4" fill="#B4643C"/>
+  
+  <!-- Feature 5 -->
+  <rect x="100" y="1210" width="1042" height="180" fill="none" stroke="#D4C8B4" stroke-width="1"/>
+  <text x="160" y="1275" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="28" font-weight="700" fill="#B4643C">05</text>
+  <text x="230" y="1275" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700" fill="#2C1810">负债分析</text>
+  <text x="230" y="1320" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#8C7B6E">首创时间负债模型，量化你的时间浪费与效率。看见负债，才能偿还。</text>
+  <circle cx="1102" cy="1300" r="4" fill="#8B4513"/>
+  
+  <!-- Page number -->
+  <text x="1142" y="1600" font-family="DM Sans, Helvetica Neue, sans-serif" font-size="14" font-weight="400" fill="#C4B8A8" text-anchor="end">03 / 05</text>
+</svg>

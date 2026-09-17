@@ -1,0 +1,195 @@
+%% GlassMemo Orb Mode — Class Diagram (增量)
+%% 仅覆盖新增/扩展类型，不重复基线 class-diagram.mermaid 已定义的类型。
+%% 与 docs/system_design-orb.md 配套。
+
+classDiagram
+  direction LR
+
+  %% ============ 渲染进程侧 ============
+
+  class ViewMode {
+    <<enumeration>>
+    note
+    orb
+  }
+
+  class Bounds {
+    +number x
+    +number y
+    +number width
+    +number height
+  }
+
+  class ViewState {
+    +ViewMode view
+    +Bounds bounds
+    +boolean isAnimating
+  }
+
+  class ViewChangePayload {
+    +ViewMode from
+    +ViewMode to
+    +Bounds bounds
+    +boolean isAnimating
+  }
+
+  class OrbDragDelta {
+    +number dx
+    +number dy
+    +string phase
+  }
+
+  class OrbConstants {
+    <<utility>>
+    +number ORB_SIZE = 60
+    +number SNAP_THRESHOLD = 30
+    +number SNAP_INSET = 8
+    +number ANIMATION_DURATION_MS = 250
+    +number DRAG_CLICK_THRESHOLD_PX = 4
+  }
+
+  class UseViewMode {
+    <<React Hook>>
+    +ViewState state
+    +subscribe() void
+    +unsubscribe() void
+  }
+
+  class Orb {
+    <<React Component>>
+    -Bounds localPos
+    -boolean isDragging
+    +render() JSX
+    -handleMouseDown(e) void
+    -handleMouseMove(e) void
+    -handleMouseUp(e) void
+    -onToggleExpand() void
+  }
+
+  class StickyNote {
+    <<React Component, 扩展>>
+    -ViewMode view
+    +render() JSX
+    +onShrinkClick() void
+    -renderToolbar() JSX
+  }
+
+  class IpcBridge {
+    <<interface, 扩展>>
+    +PinApi pin
+    +ViewApi view
+  }
+
+  class ViewApi {
+    <<interface>>
+    +toggle(source) Promise~ViewState~
+    +get() Promise~ViewState~
+    +onChange(cb) Unsubscribe
+    +drag(delta) Promise~void~
+  }
+
+  %% ============ 主进程侧 ============
+
+  class OrbController {
+    -BrowserWindow win
+    -BoundsRepository repo
+    -ViewMode currentView
+    -Bounds currentBounds
+    -boolean isAnimating
+    -DragHandler dragHandler
+    +toggle(source) ViewState
+    -shrink() Promise~ViewState~
+    -expand() Promise~ViewState~
+    +getState() ViewState
+    -emitChange(payload) void
+  }
+
+  class BoundsRepository {
+    -string userDataPath
+    +saveNote(bounds) Promise~void~
+    +saveOrb(bounds) Promise~void~
+    +loadNote() Promise~Bounds~
+    +loadOrb() Promise~Bounds~
+    +saveLastView(view) Promise~void~
+    +loadLastView() Promise~ViewMode~
+  }
+
+  class DragHandler {
+    -Bounds startBounds
+    -boolean isDragging
+    -Display display
+    +onDrag(payload, win, snap, repo) void
+    -handleStart(payload) void
+    -handleMove(payload, win, snap) Bounds
+    -handleEnd(payload, win, snap, repo) Bounds
+  }
+
+  class SnappingPolicy {
+    <<pure functions>>
+    +number SNAP_THRESHOLD
+    +number SNAP_INSET
+    +number ORB_SIZE
+    +apply(bounds, workArea) Bounds
+    +clampToWorkArea(bounds, workArea) Bounds
+  }
+
+  class OrbToggleRequest {
+    <<DTO>>
+    +string source
+  }
+
+  class ViewStateFile {
+    <<JSON, userData/view-state.json>>
+    +ViewMode lastView
+  }
+
+  class NoteBoundsFile {
+    <<JSON, userData/note-bounds.json>>
+    +Bounds bounds
+  }
+
+  class OrbBoundsFile {
+    <<JSON, userData/orb-bounds.json>>
+    +Bounds bounds
+  }
+
+  %% ============ 关系 ============
+
+  ViewState "1" --> "1" ViewMode
+  ViewState "1" --> "1" Bounds
+  ViewChangePayload "1" --> "2" ViewMode
+  ViewChangePayload "1" --> "1" Bounds
+
+  UseViewMode ..> ViewState : 订阅
+  UseViewMode ..> ViewChangePayload : 接收
+
+  Orb ..> OrbDragDelta : 构造
+  Orb ..> OrbConstants : 读取
+  Orb ..> ViewApi : 调用
+  Orb ..> StickyNote : 替换渲染（view==='orb'）
+
+  StickyNote "1" --> "1" ViewMode : 当前形态
+  StickyNote ..> ViewApi : 调用 view.toggle
+  StickyNote ..> Orb : 条件渲染子组件
+
+  IpcBridge "1" --> "1" ViewApi : 暴露
+  ViewApi ..> OrbController : 经 IPC 调用
+  ViewApi ..> DragHandler : 经 IPC 调用
+
+  OrbController "1" --> "1" BoundsRepository : 持有
+  OrbController "1" --> "1" DragHandler : 持有
+  OrbController ..> ViewState : 读写
+  OrbController ..> ViewChangePayload : 构造
+
+  BoundsRepository ..> NoteBoundsFile : 读写
+  BoundsRepository ..> OrbBoundsFile : 读写
+  BoundsRepository ..> ViewStateFile : 读写
+
+  DragHandler ..> SnappingPolicy : 调用
+  DragHandler ..> BoundsRepository : 调用（phase=end 时持久化）
+  DragHandler ..> OrbDragDelta : 接收
+  DragHandler ..> Bounds : 读写
+
+  SnappingPolicy ..> Bounds : 读写
+
+  OrbToggleRequest ..> OrbController : 入参

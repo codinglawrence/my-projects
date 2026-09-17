@@ -1,0 +1,64 @@
+﻿/* ========================================
+   Ant Design Enterprise — Global Styles
+   RAG 企业级知识库问答系统
+   ======================================== */
+
+/* Font stack — Plus Jakarta Sans as primary, JetBrains Mono for code */
+body {
+  font-family:
+    'Plus Jakarta Sans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mono font for code blocks, pre, and technical content */
+code,
+pre,
+kbd,
+.ant-typography code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* Streaming cursor blink animation */
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: cursor-blink 0.8s infinite;
+}
+
+/* Smooth scroll for chat area */
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Enterprise card shadow — subtle and professional */
+.enterprise-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.enterprise-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Inline citation highlight */
+.citation-anchor {
+  color: #1677ff;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.citation-anchor:hover {
+  text-decoration: underline;
+}

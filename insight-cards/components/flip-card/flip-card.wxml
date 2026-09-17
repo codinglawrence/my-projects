@@ -1,0 +1,57 @@
+<!-- components/flip-card/flip-card.wxml -->
+<!-- 金属镭射双面卡牌
+     - .flip-card  perspective（父级景深）+ isolation:isolate（限制混合）
+                    + 手指触控事件(catchtouch*，已禁用重力感应，保留重力代码备用)
+     - .fc-tilt    倾斜(rotateX/Y, ±30°)（当前【由手指在卡面触摸拖动】驱动，
+                    经 _applyGyroTick 的同一套映射逻辑；重力感应代码已禁用保留）
+     - .fc-rotator flip（rotateY 0↔180）+ backface-visibility（照见双面卡）
+     - .fc-foil-layer (= 旧 :before) 彩虹/稀有度渐变层 <view>，color-dodge 优雅增强，
+                    背景位置由 JS(fcFoilPos) 或 idle 动画驱动
+     - .fc-holo-layer (= 旧 :after)  真实箔纹理 <image>，dataUri 来自 getTexture（data/textures.js），
+                    不内联 base64、不用 WXSS 本地图、<image> 不挂 mix-blend-mode；
+                    随触控轻微 translate(fcHoloShift) 与卡牌倾斜形成视差
+     - 箔层由 data/foilLayers（按 card.rarity）驱动，wx:for 渲染于 bg(z1) 与 fg(z4) 之间 -->
+<!-- 外层 wrapper：不参与 3D 旋转，专门负责圆角裁切与阴影，防止内部 tilt/foil/holo 溢出到卡牌边界外 -->
+<view class="flip-card-wrapper">
+  <view class="flip-card {{idle ? 'idle' : ''}} {{flipped ? 'is-flipped' : ''}} {{clipClass}} {{clipSupported ? '' : 'no-clip-path'}}"
+        catchtouchstart="onTouchStart" catchtouchmove="onTouchMove" catchtouchend="onTouchEnd" catchtouchcancel="onTouchEnd"
+        catchtap="onTap" style="{{cssVars}}">
+    <view class="fc-tilt {{dragging ? 'is-dragging' : ''}}" style="transform:{{tiltStyle}}">
+      <view class="fc-rotator">
+        <!-- 正面：谜面（bg 在下、箔纹夹中间、fg 文字符号浮最上） -->
+        <view class="fc-face fc-front">
+          <image class="flip-face-bg" src="{{card.artFrontBg}}" mode="aspectFill" catchtouchstart="onTouchStart" catchtouchmove="onTouchMove" catchtouchend="onTouchEnd" catchtouchcancel="onTouchEnd" />
+          <view class="fc-layers">
+            <block wx:for="{{foilLayers}}" wx:key="z">
+              <view wx:if="{{!item.isImage}}" class="fc-layer fc-foil-layer {{item.anim}}"
+                    style="background-image:{{item.gradient}};opacity:{{item.opacity}};mix-blend-mode:{{item.blend}};z-index:{{item.z}};background-position:{{fcFoilPos}}"></view>
+              <image wx:else class="fc-layer fc-holo-layer"
+                     src="{{item.src}}" mode="aspectFill"
+                     style="opacity:{{item.opacity}};z-index:{{item.z}};transform:translate({{fcHoloShift}})"></image>
+            </block>
+          </view>
+          <image class="flip-face-fg" src="{{card.artFrontFg}}" mode="aspectFill" catchtouchstart="onTouchStart" catchtouchmove="onTouchMove" catchtouchend="onTouchEnd" catchtouchcancel="onTouchEnd" />
+        </view>
+        <!-- 背面：问题 -->
+        <view class="fc-face fc-back">
+          <image class="flip-face-bg" src="{{card.artBackBg}}" mode="aspectFill" catchtouchstart="onTouchStart" catchtouchmove="onTouchMove" catchtouchend="onTouchEnd" catchtouchcancel="onTouchEnd" />
+          <view class="fc-layers">
+            <block wx:for="{{foilLayers}}" wx:key="z">
+              <view wx:if="{{!item.isImage}}" class="fc-layer fc-foil-layer {{item.anim}}"
+                    style="background-image:{{item.gradient}};opacity:{{item.opacity}};mix-blend-mode:{{item.blend}};z-index:{{item.z}};background-position:{{fcFoilPos}}"></view>
+              <image wx:else class="fc-layer fc-holo-layer"
+                     src="{{item.src}}" mode="aspectFill"
+                     style="opacity:{{item.opacity}};z-index:{{item.z}};transform:translate({{fcHoloShift}})"></image>
+            </block>
+          </view>
+          <image class="flip-face-fg" src="{{card.artBackFg}}" mode="aspectFill" catchtouchstart="onTouchStart" catchtouchmove="onTouchMove" catchtouchend="onTouchEnd" catchtouchcancel="onTouchEnd" />
+          <!-- 背面底部操作条：收藏 / 写笔记（翻面后显示） -->
+          <view class="fc-actions {{flipped ? 'show' : ''}}">
+            <text class="fc-fav {{favorited ? 'on' : ''}}" catchtap="onFav">{{favorited ? '★ 已收藏' : '☆ 收藏'}}</text>
+            <text class="fc-note" catchtap="onNote">✎ 写笔记</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

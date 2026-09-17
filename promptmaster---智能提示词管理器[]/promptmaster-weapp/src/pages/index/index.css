@@ -1,0 +1,163 @@
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  font-size: 12px;
+  background-color: #fff;
+}
+
+.filter-btn.active {
+  background-color: #007aff;
+  color: #fff;
+  border-color: #007aff;
+}
+
+.prompts-container {
+  flex: 1;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 0;
+  color: #999;
+}
+
+.grid-view {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.prompt-card {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.prompt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.prompt-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+}
+
+.favorite-btn {
+  font-size: 20px;
+}
+
+.favorite-active {
+  color: #ffcc00;
+}
+
+.favorite {
+  color: #ddd;
+}
+
+.prompt-content {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.prompt-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.tag {
+  padding: 4px 10px;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.prompt-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+.add-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #007aff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}

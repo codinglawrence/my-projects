@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!-- 一个按照时间来记录式的网页 -->
+<!-- keep 按照微信读书的日期样式，打卡了显示蓝色，没打卡显示日期，一个月设置30/31个方格 -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>习惯追踪</title>
+    <style>
+        @import url('kissrecord.css');
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 主题切换控制按钮 -->
+        <div class="theme-controls">
+            <button id="prev-theme-btn" class="theme-btn">上一个主题</button>
+            <span id="current-theme-name" class="theme-name">Keep</span>
+            <button id="next-theme-btn" class="theme-btn">下一个主题</button>
+        </div>
+
+        <!-- 单个主题容器 -->
+        <div class="theme-container">
+            <div class="theme-item active" id="keep">
+                <h2>Keep</h2>
+                <div class="month-nav">
+                    <button class="nav-btn prev-btn">上一月</button>
+                    <span class="current-month"></span>
+                    <button class="nav-btn next-btn">下一月</button>
+                </div>
+                <div class="calendar"></div>
+                <div class="page-indicator">
+                    第 <span class="current-page"></span> 页，共 <span class="total-pages"></span> 页
+                </div>
+            </div>
+
+            <div class="theme-item" id="improve">
+                <h2>Improve</h2>
+                <div class="month-nav">
+                    <button class="nav-btn prev-btn">上一月</button>
+                    <span class="current-month"></span>
+                    <button class="nav-btn next-btn">下一月</button>
+                </div>
+                <div class="calendar"></div>
+                <div class="page-indicator">
+                    第 <span class="current-page"></span> 页，共 <span class="total-pages"></span> 页
+                </div>
+            </div>
+
+            <div class="theme-item" id="start">
+                <h2>Start</h2>
+                <div class="month-nav">
+                    <button class="nav-btn prev-btn">上一月</button>
+                    <span class="current-month"></span>
+                    <button class="nav-btn next-btn">下一月</button>
+                </div>
+                <div class="calendar"></div>
+                <div class="page-indicator">
+                    第 <span class="current-page"></span> 页，共 <span class="total-pages"></span> 页
+                </div>
+            </div>
+
+            <div class="theme-item" id="stop">
+                <h2>Stop</h2>
+                <div class="month-nav">
+                    <button class="nav-btn prev-btn">上一月</button>
+                    <span class="current-month"></span>
+                    <button class="nav-btn next-btn">下一月</button>
+                </div>
+                <div class="calendar"></div>
+                <div class="page-indicator">
+                    第 <span class="current-page"></span> 页，共 <span class="total-pages"></span> 页
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="kissrecord.js"></script>
+</body>
+
+</html>

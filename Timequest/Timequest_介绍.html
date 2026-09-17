@@ -1,0 +1,684 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timequest · 时间负债管理工具</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&amp;family=IBM+Plex+Mono:wght@300;400;500;600&amp;family=Noto+Serif+SC:wght@300;400;500;600;700;900&amp;family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a1f3d;
+    --ink-rgb:10,31,61;
+    --paper:#f1f3f5;
+    --paper-rgb:241,243,245;
+    --paper-tint:#e4e8ec;
+    --ink-tint:#152a4a;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
+    --serif-body-en:"Source Serif 4",Georgia,serif;
+    --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
+    --sans-zh:"Noto Sans SC",source-han-sans-sc,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;transition:opacity 1.2s ease}
+  canvas#bg-light{opacity:0}
+  canvas#bg-dark{opacity:1}
+  body.light-bg canvas#bg-light{opacity:1}
+  body.light-bg canvas#bg-dark{opacity:0}
+  body.low-power canvas.bg{display:none!important}
+  #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
+  .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6vh 6vw 10vh 6vw;display:flex;flex-direction:column;overflow:hidden}
+  .slide.light{color:var(--ink);background:var(--paper)}
+  .slide.dark{color:var(--paper);background:var(--ink)}
+  .slide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;transition:background .7s ease}
+  .slide.light::before{background:rgba(var(--paper-rgb),.78);backdrop-filter:blur(3px)}
+  .slide.dark::before{background:rgba(var(--ink-rgb),.78);backdrop-filter:blur(3px)}
+  .slide.hero.light::before{background:rgba(var(--paper-rgb),.16);backdrop-filter:none}
+  .slide.hero.dark::before{background:rgba(var(--ink-rgb),.12);backdrop-filter:none}
+  .slide.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+  .slide.hero.light::after{background:linear-gradient(180deg,rgba(var(--paper-rgb),.28) 0%,rgba(var(--paper-rgb),0) 14%,rgba(var(--paper-rgb),0) 86%,rgba(var(--paper-rgb),.28) 100%)}
+  .slide.hero.dark::after{background:linear-gradient(180deg,rgba(var(--ink-rgb),.32) 0%,rgba(var(--ink-rgb),0) 14%,rgba(var(--ink-rgb),0) 86%,rgba(var(--ink-rgb),.32) 100%)}
+  .chrome{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+  .chrome .left,.chrome .right{display:flex;gap:2.4em;align-items:center}
+  .chrome .sep{width:40px;height:1px;background:currentColor;opacity:.4}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.55}
+  .foot .title{font-family:var(--serif-zh);font-weight:400;letter-spacing:.05em;text-transform:none;opacity:.75;font-size:13px}
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;padding:6px 14px;border:1px solid currentColor;opacity:.85}
+  .rule{width:100%;height:1px;background:currentColor;opacity:.25;margin:3vh 0}
+  .rule.v{width:1px;height:auto}
+  .img-slot{border:1.5px dashed rgba(127,127,127,.4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1vh;padding:2vh 2vw;font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;opacity:.55;position:relative;aspect-ratio:16/9;width:100%;max-height:56vh;margin-inline:auto;box-sizing:border-box}
+  .img-slot::before{content:"";position:absolute;inset:8px;border:1px solid currentColor;opacity:.2}
+  .img-slot .plus{font-size:2vw;font-weight:300;opacity:.5;letter-spacing:0}
+  .img-slot .label{position:relative;z-index:2;text-align:center}
+  .img-slot.r-4x3{aspect-ratio:4/3}
+  .img-slot.r-3x2{aspect-ratio:3/2}
+  .img-slot.r-1x1{aspect-ratio:1/1}
+  .frame-img{overflow:hidden;position:relative;background:rgba(0,0,0,.04);box-sizing:border-box;width:100%;border-radius:4px}
+  .slide.dark .frame-img{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+  .frame-img > img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .frame-img.fit-contain > img{object-fit:contain;object-position:center center}
+  .frame-img.r-16x9{aspect-ratio:16/9;max-height:64vh}
+  .frame-img.r-16x10{aspect-ratio:16/10;max-height:56vh}
+  .frame-img.r-4x3{aspect-ratio:4/3;max-height:56vh}
+  .frame-img.r-3x2{aspect-ratio:3/2;max-height:46vh}
+  .frame-img.r-3x4{aspect-ratio:3/4;max-height:60vh}
+  .frame-img.r-1x1{aspect-ratio:1/1;max-height:50vh}
+  .frame-img.h-16{height:16vh}
+  .frame-img.h-18{height:18vh}
+  .frame-img.h-22{height:22vh}
+  .frame-img.h-26{height:26vh}
+  .frame-img.h-28{height:28vh}
+  .frame-cap{display:flex;justify-content:space-between;align-items:baseline;gap:1vw;margin-top:.8vh;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.72}
+  .frame-cap .pf{font-family:var(--serif-zh);font-weight:600;font-size:max(13px,1vw);letter-spacing:.04em;text-transform:none;opacity:.94}
+  .frame-cap .nb{font-family:var(--serif-en);font-style:italic;font-size:max(15px,1.2vw);letter-spacing:.02em;text-transform:none;opacity:.88}
+  .frame-cap .idx{font-family:var(--mono);opacity:.5}
+  figure.tile{display:flex;flex-direction:column;margin:0;min-width:0}
+  figure.tile > .frame-img{flex:0 0 auto}
+  #nav{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:30;display:flex;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s ease;border:0;padding:0}
+  #nav .dot:hover{background:rgba(255,255,255,.5);transform:scale(1.15)}
+  #nav .dot.active{background:rgba(255,255,255,.95);width:22px;border-radius:999px}
+  body.light-bg #nav{background:rgba(255,255,255,.25)}
+  body.light-bg #nav .dot{background:rgba(var(--ink-rgb),.25)}
+  body.light-bg #nav .dot.active{background:rgba(var(--ink-rgb),.9)}
+  #hint{position:fixed;bottom:3vh;right:3vw;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;mix-blend-mode:difference;color:#aaa}
+  body.low-power #hint{opacity:.72;color:var(--paper);mix-blend-mode:normal}
+  body.light-bg.low-power #hint{color:var(--ink)}
+  .frame{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .frame.grid-2-7-5,.frame.grid-2-6-6,.frame.grid-2-8-4,.frame.grid-3-3,.frame.grid-6{display:grid}
+  .h-hero{font-family:var(--serif-zh);font-weight:900;font-size:10vw;line-height:.96;letter-spacing:-.02em}
+  .h-xl{font-family:var(--serif-zh);font-weight:700;font-size:6.2vw;line-height:1.08;letter-spacing:-.01em}
+  .h-sub{font-family:var(--serif-zh);font-weight:500;font-size:3.1vw;line-height:1.25;letter-spacing:0;opacity:.7}
+  .h-md{font-family:var(--serif-zh);font-weight:600;font-size:2.3vw;line-height:1.3}
+  .h-hero-en,.h-xl-en{font-family:var(--serif-en);letter-spacing:-.025em}
+  .lead{font-family:var(--serif-zh);font-weight:400;font-size:1.75vw;line-height:1.5;opacity:.86}
+  .meta-row{display:flex;gap:1.2em;align-items:baseline;flex-wrap:wrap;font-family:var(--mono);font-size:max(12px,.92vw);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;opacity:.5;margin-bottom:1.4vh}
+  .grid-2-7-5{display:grid;grid-template-columns:7fr 5fr;gap:4vw;flex:1;align-items:start;align-content:center}
+  .grid-2-6-6{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:start;align-content:center}
+  .grid-2-8-4{display:grid;grid-template-columns:8fr 4fr;gap:4vw;flex:1;align-items:start;align-content:center}
+  .grid-3-3{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:3vh 4vw;flex:1;align-content:center}
+  .grid-6{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4vh 4vw;flex:1;align-content:center}
+  .grid-4{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:4vh 6vw;flex:1;align-content:center}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:4vw;flex:1;align-content:center}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:center}
+  .split-55{display:grid;grid-template-columns:55fr 45fr;gap:5vw;flex:1;align-items:stretch}
+  .fill{flex:1}
+  .center{align-items:center;justify-content:center;text-align:center}
+  .bottom-left{position:absolute;left:6vw;bottom:9vh;max-width:50vw}
+  .bottom-right{position:absolute;right:6vw;bottom:9vh;max-width:50vw;text-align:right}
+  .top-right{position:absolute;right:6vw;top:6vh;text-align:right}
+  .stat{display:flex;flex-direction:column;gap:1vh;align-items:flex-start}
+  .stat .n{font-family:var(--serif-en);font-weight:800;font-size:8vw;line-height:.88;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .stat .l{font-family:var(--sans-zh);font-size:max(13px,1.05vw);opacity:.7;margin-top:1vh;font-weight:400;line-height:1.5}
+  .stat .m{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.5;margin-bottom:.2vh}
+  .callout{padding:3vh 2.4vw;border-left:3px solid currentColor;position:relative;font-family:var(--serif-zh);font-size:max(15px,1.2vw);line-height:1.55;opacity:.92}
+  .slide.light .callout{background:rgba(var(--ink-rgb),.05)}
+  .slide.dark .callout{background:rgba(var(--paper-rgb),.06)}
+  .callout .cite{display:block;margin-top:1.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+  .callout .q-big{font-family:var(--serif-zh);font-weight:600;font-size:max(17px,1.6vw);line-height:1.42}
+  .plat{display:flex;flex-direction:column;justify-content:flex-end;padding:2vh 0;border-top:1px solid currentColor;border-color:rgba(127,127,127,.35)}
+  .plat .name{font-family:var(--serif-zh);font-weight:700;font-size:1.8vw;margin-bottom:.6vh}
+  .plat .nb{font-family:var(--serif-en);font-weight:700;font-size:3.2vw;letter-spacing:-.02em;line-height:1;font-feature-settings:"tnum"}
+  .plat .sub{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-top:.6vh}
+  .plat .fill{font-family:var(--sans-zh);font-weight:300;font-size:2.4vw;opacity:.28;letter-spacing:-.01em;line-height:1}
+  .rowline{display:grid;grid-template-columns:1fr 2fr 1fr;gap:2vw;padding:2.2vh 0;border-top:1px solid currentColor;align-items:center;border-color:rgba(127,127,127,.25)}
+  .rowline:last-child{border-bottom:1px solid currentColor;border-color:rgba(127,127,127,.25)}
+  .rowline .k{font-family:var(--serif-zh);font-weight:700;font-size:1.7vw}
+  .rowline .v{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.2vw);opacity:.85;line-height:1.55}
+  .rowline .m{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;justify-self:end}
+  .pillar{display:flex;flex-direction:column;gap:1.8vh}
+  .pillar .ic{font-family:var(--serif-en);font-style:italic;font-size:2.6vw;opacity:.45;font-weight:400}
+  .pillar .ic svg{width:2.8vw;height:2.8vw;stroke-width:1.2;opacity:.7}
+  .pillar .t{font-family:var(--serif-zh);font-weight:700;font-size:2.4vw;line-height:1.1}
+  .pillar .d{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.1vw);opacity:.76;line-height:1.6}
+  .sign{font-family:var(--serif-en);font-style:italic;font-weight:500;font-size:2vw;opacity:.7}
+  .hi{position:relative;display:inline}
+  .slide.dark .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--paper-rgb),.15);z-index:-1}
+  .slide.light .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--ink-rgb),.08);z-index:-1}
+  .ico{width:1em;height:1em;display:inline-block;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .ico-lg,.ico-md,.ico-sm{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+  .ico-lg{width:2.6vw;height:2.6vw;stroke-width:1.2;display:inline-block}
+  .ico-md{width:1.8vw;height:1.8vw;stroke-width:1.3;display:inline-block;vertical-align:-.4em}
+  .ico-sm{width:1.1vw;height:1.1vw;stroke-width:1.4;display:inline-block;vertical-align:-.15em;opacity:.7}
+  .pipeline-section{margin-top:3.6vh;padding-top:3.6vh;border-top:1px solid currentColor;border-color:rgba(127,127,127,.2)}
+  .pipeline-section:first-of-type{margin-top:0;padding-top:0;border-top:none}
+  .pipeline-label{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.5;margin-bottom:2vh}
+  .pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:2vw}
+  .pipeline[data-cols="3"]{grid-template-columns:repeat(3,1fr)}
+  .pipeline[data-cols="4"]{grid-template-columns:repeat(4,1fr)}
+  .pipeline[data-cols="6"]{grid-template-columns:repeat(6,1fr)}
+  .step{display:flex;flex-direction:column;gap:.8vh}
+  .step-nb{font-family:var(--serif-en);font-weight:700;font-size:2.4vw;opacity:.4;font-style:italic}
+  .step-title{font-family:var(--serif-zh);font-weight:600;font-size:1.5vw;line-height:1.2}
+  .step-desc{font-family:var(--sans-zh);font-weight:400;font-size:max(12px,.95vw);opacity:.68;line-height:1.5}
+  @media(max-width:768px){
+    .h-hero{font-size:13vw}
+    .h-xl{font-size:8vw}
+    .h-sub{font-size:4.5vw}
+    .lead{font-size:2.4vw}
+    .stat .n{font-size:10vw}
+    .grid-6{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr)}
+    .grid-4{grid-template-columns:1fr 1fr}
+    .grid-3{grid-template-columns:1fr 1fr}
+    .rowline{grid-template-columns:1fr 2fr}
+    .rowline .m{display:none}
+    .pipeline{grid-template-columns:repeat(2,1fr)}
+    .h-md{font-size:3.4vw}
+    .pillar .t{font-size:3.2vw}
+    .pillar .d{font-size:max(13px,1.5vw)}
+  }
+  body.motion-ready [data-anim]{opacity:0}
+  body.motion-ready [data-animate="pipeline"] [data-anim]{opacity:.15}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+</head>
+<body>
+<div id="deck">
+<!-- Page 1: Cover -->
+<section class="slide hero dark" data-theme="dark">
+  <div class="chrome">
+    <div class="left"><span>Timequest · 产品介绍</span></div>
+    <div class="right"><span>01 / 08</span></div>
+  </div>
+  <div class="frame center" style="display:grid; gap:4vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>时间负债管理工具</div>
+    <h1 class="h-hero" data-anim>Timequest</h1>
+    <h2 class="h-sub" data-anim>让每一分钟都有价值</h2>
+    <p class="lead" style="max-width:60vw" data-anim>
+      基于<em class="en">时间负债</em>概念的时间记录与管理工具<br>帮助用户追踪时间使用情况，发现时间浪费黑洞
+    </p>
+    <div class="meta-row" data-anim>
+      <span>Lawrence · 独立开发者</span><span>·</span><span>inspired by Wave</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="title">一场关于时间管理的实验</div>
+    <div>— 2026 —</div>
+  </div>
+</section>
+
+<!-- Page 2: Problem -->
+<section class="slide light" data-theme="light">
+  <div class="chrome">
+    <div class="left"><span>痛点 · 时间浪费</span></div>
+    <div class="right"><span>02 / 08</span></div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>我们每天都在丢失时间</div>
+    <h2 class="h-xl" data-anim>时间都去哪了？</h2>
+    <p class="lead" style="margin-bottom:4vh" data-anim>没有数据支撑，时间管理只能凭感觉</p>
+    <div class="grid-4">
+      <div class="stat" data-anim>
+        <span class="m">Estimation Bias</span>
+        <span class="n">±40<em style="font-size:.4em;opacity:.5;font-style:normal">%</em></span>
+        <span class="l">凭感觉估计的耗时偏差</span>
+      </div>
+      <div class="stat" data-anim>
+        <span class="m">Old Workflow</span>
+        <span class="n">6</span>
+        <span class="l">传统飞书记录流程需要6步操作</span>
+      </div>
+      <div class="stat" data-anim>
+        <span class="m">Data Blind</span>
+        <span class="n">0</span>
+        <span class="l">无数据支撑，无法分析时间分配</span>
+      </div>
+      <div class="stat" data-anim>
+        <span class="m">No Insight</span>
+        <span class="n">?</span>
+        <span class="l">不知道如何改进时间使用效率</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="title">痛点 · 没有测量就没有管理</div>
+    <div>Problem</div>
+  </div>
+</section>
+
+<!-- Page 3: Time Debt Concept -->
+<section class="slide dark" data-theme="dark">
+  <div class="chrome">
+    <div class="left"><span>核心概念 · 时间负债</span></div>
+    <div class="right"><span>03 / 08</span></div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>The Core Concept</div>
+    <h2 class="h-xl" data-anim>时间负债</h2>
+    <p class="lead" style="max-width:70vw;margin-bottom:4vh" data-anim>
+      指人们因为<em class="en">拖延</em>、<em class="en">低效</em>、<em class="en">琐事干扰</em>而产生的隐性时间损失
+    </p>
+    <div class="callout" style="max-width:70vw" data-anim>
+      <div class="q-big">时间负债不是时间管理的问题，<br>而是<em class="en">价值管理</em>的问题。</div>
+      <span class="cite">— Wave · 效率社群群主</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="title">灵感来源 · 效率社群讨论</div>
+    <div>Concept</div>
+  </div>
+</section>
+<!-- Page 4: Core Features -->
+<section class="slide light" data-theme="light">
+  <div class="chrome">
+    <div class="left"><span>核心功能</span></div>
+    <div class="right"><span>04 / 08</span></div>
+  </div>
+  <div class="frame" style="padding-top:4vh">
+    <div class="kicker" data-anim>四大核心功能</div>
+    <h2 class="h-xl" data-anim>从记录到洞察</h2>
+    <div class="grid-3" style="margin-top:5vh">
+      <div class="pillar" data-anim>
+        <div class="ic">01</div>
+        <div class="t">时间<br>记录</div>
+        <div class="d">一键开始/结束计时<br>支持暂停与恢复<br>自动计算有效时长</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">02</div>
+        <div class="t">活动<br>分类</div>
+        <div class="d">自定义活动类别<br>工作/学习/娱乐/休息<br>按类别统计时间分配</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="ic">03</div>
+        <div class="t">负债<br>分析</div>
+        <div class="d">时间负债仪表盘<br>有效时间/无效时间<br>负债率与优化建议</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="title">核心功能 · 从计时到洞察</div>
+    <div>Features</div>
+  </div>
+</section>
+
+<!-- Page 5: Act Divider -->
+<section class="slide hero light" data-theme="light">
+  <div class="chrome">
+    <div class="left"><span>你的时间，值多少钱？</span></div>
+    <div class="right"><span>05 / 08</span></div>
+  </div>
+  <div class="frame center" style="display:grid; gap:6vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Ask Yourself</div>
+    <h1 class="h-hero" style="font-size:8.5vw" data-anim>你的时间</h1>
+    <h2 class="h-sub" data-anim>值多少钱？</h2>
+    <p class="lead" style="max-width:55vw" data-anim>
+      如果时间是一笔资产，你有认真记账吗？
+    </p>
+  </div>
+  <div class="foot">
+    <div class="title">你的时间，比你想象的更值钱</div>
+    <div>— · —</div>
+  </div>
+</section>
+
+<!-- Page 6: Product Highlights -->
+<section class="slide dark" data-theme="dark">
+  <div class="chrome">
+    <div class="left"><span>产品亮点</span></div>
+    <div class="right"><span>06 / 08</span></div>
+  </div>
+  <div class="frame" style="padding-top:4vh">
+    <div class="kicker" data-anim>Why Timequest</div>
+    <h2 class="h-xl" data-anim>为什么选择 Timequest？</h2>
+    <div style="margin-top:5vh">
+      <div class="rowline" data-anim>
+        <div class="k">一键计时</div>
+        <div class="v">选择活动 → 点击开始 → 专注工作 → 点击结束，全程无需多余操作</div>
+        <div class="m">SIMPLE</div>
+      </div>
+      <div class="rowline" data-anim>
+        <div class="k">可视化统计</div>
+        <div class="v">饼图与柱状图直观展示时间分配，一眼看出时间花在哪里</div>
+        <div class="m">VISUAL</div>
+      </div>
+      <div class="rowline" data-anim>
+        <div class="k">负债仪表盘</div>
+        <div class="v">输入时薪与理想时薪，自动计算时间负债率与已利用时间价值</div>
+        <div class="m">ANALYTICS</div>
+      </div>
+      <div class="rowline" data-anim>
+        <div class="k">移动优先</div>
+        <div class="v">基于 Vant 4 设计系统，专为移动端打造，随时随地记录</div>
+        <div class="m">MOBILE</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="title">亮点 · 简单、可视、可分析</div>
+    <div>Highlights</div>
+  </div>
+</section>
+<!-- Page 7: User Workflow -->
+<section class="slide light" data-theme="light" data-animate="pipeline">
+  <div class="chrome">
+    <div class="left"><span>使用流程</span></div>
+    <div class="right"><span>07 / 08</span></div>
+  </div>
+  <div class="frame" style="padding-top:4vh">
+    <div class="kicker" data-anim>三步开始</div>
+    <h2 class="h-xl" data-anim>简单到只需三秒</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">User Journey</div>
+      <div class="pipeline" data-cols="3">
+        <div class="step" data-anim="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">选择活动</div>
+          <div class="step-desc">从预设类别中选择<br>工作 / 学习 / 娱乐 / 休息</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">开始计时</div>
+          <div class="step-desc">一键开始专注<br>支持中途暂停与恢复</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">查看分析</div>
+          <div class="step-desc">自动生成时间分布报告<br>时间负债仪表盘洞察</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="title">使用流程 · 选择 → 计时 → 分析</div>
+    <div>Workflow</div>
+  </div>
+</section>
+
+<!-- Page 8: Close -->
+<section class="slide hero dark" data-theme="dark">
+  <div class="chrome">
+    <div class="left"><span>Timequest</span></div>
+    <div class="right"><span>08 / 08</span></div>
+  </div>
+  <div class="frame center" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>Start Your Journey</div>
+    <h1 class="h-hero" data-anim>让每一分钟</h1>
+    <h2 class="h-sub" data-anim>都有价值</h2>
+    <div class="callout" style="max-width:60vw;border-left:none;text-align:center" data-anim>
+      <div class="q-big">coded by <em class="en">Lawrence</em><br>inspired by <em class="en">Wave</em></div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="title">开始你的时间复利之旅</div>
+    <div>— END —</div>
+  </div>
+</section>
+
+</div>
+
+<div id="nav"></div>
+<div id="hint">← → 翻页 · Esc 概览 · B 省电</div>
+<div id="overlay" style="display:none;position:fixed;inset:0;z-index:20;background:var(--ink);overflow:auto;padding:4vh 4vw"></div>
+
+<script>
+const deck=document.getElementById('deck');
+const nav=document.getElementById('nav');
+const ov=document.getElementById('overlay');
+const slides=[...document.querySelectorAll('.slide')];
+const total=slides.length;
+let idx=0;
+let overviewOn=false;
+window.__lowPowerMode=false;
+
+window.__setLowPowerMode=(v)=>{
+  window.__lowPowerMode=v;
+  document.body.classList.toggle('low-power',v);
+  if(v){slides.forEach(s=>{s.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='1';el.style.transform='none'})})}
+  if(!v && typeof window.__playSlide==='function') window.__playSlide(idx);
+};
+
+function go(i){
+  if(i<0||i>=total)return;
+  idx=i;
+  deck.style.transform='translateX(-'+idx+'00vw)';
+  const s=slides[idx];
+  document.body.classList.toggle('light-bg',s.classList.contains('light'));
+  nav.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===idx));
+  if(typeof window.__playSlide==='function') window.__playSlide(idx);
+}
+
+for(let i=0;i<total;i++){
+  const dot=document.createElement('button');
+  dot.className='dot'+(i===0?' active':'');
+  dot.onclick=()=>go(i);
+  nav.appendChild(dot);
+}
+
+ov.onclick=()=>toggleOverview();
+document.body.appendChild(ov);
+
+function buildOverview(){
+  ov.innerHTML='';
+  const grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:2vh 1.6vw;max-width:90vw;margin:0 auto';
+  slides.forEach((s,i)=>{
+    const card=document.createElement('div');
+    card.style.cssText='cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid '+(i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)')+';transition:border-color .2s';
+    card.onmouseenter=()=>card.style.borderColor='rgba(var(--paper-rgb),.6)';
+    card.onmouseleave=()=>card.style.borderColor=i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;pointer-events:none;background:'+(s.classList.contains('light')?'var(--paper)':'var(--ink)');
+    const clone=s.cloneNode(true);
+    clone.style.cssText='width:100vw;height:100vh;transform:scale('+(1/4.5)+');transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none';
+    wrap.appendChild(clone);
+    const label=document.createElement('div');
+    label.style.cssText='padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);opacity:.7';
+    label.textContent=(i+1)+' / '+total;
+    card.appendChild(wrap);
+    card.appendChild(label);
+    card.onclick=()=>{toggleOverview();go(i)};
+    grid.appendChild(card);
+  });
+  ov.appendChild(grid);
+}
+
+function toggleOverview(){
+  overviewOn=!overviewOn;
+  if(overviewOn){buildOverview();ov.style.display='block';}
+  else{ov.style.display='none';}
+}
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleOverview();return;}
+  if(e.key && e.key.toLowerCase()==='b' && !e.metaKey && !e.ctrlKey && !e.altKey){
+    e.preventDefault();
+    window.__setLowPowerMode(!window.__lowPowerMode);
+    return;
+  }
+  if(overviewOn)return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='ArrowDown'){
+    if(window.__pipeAdvance && window.__pipeAdvance()) return;
+    go(idx+1);
+    return;
+  }
+  if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='ArrowUp')go(idx-1);
+  if(e.key==='Home')go(0);
+  if(e.key==='End')go(total-1);
+});
+
+let wheelTO=null,wheelAcc=0;
+addEventListener('wheel',e=>{
+  wheelAcc+=e.deltaY+e.deltaX;
+  if(Math.abs(wheelAcc)>50){
+    if(wheelAcc>0 && window.__pipeAdvance && window.__pipeAdvance()){
+      wheelAcc=0;
+    }else{
+      go(idx+(wheelAcc>0?1:-1));wheelAcc=0;
+    }
+  }
+  clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150);
+},{passive:true});
+
+let tx=0,ty=0;
+addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+addEventListener('touchend',e=>{
+  const dx=(e.changedTouches[0].clientX-tx);
+  const dy=(e.changedTouches[0].clientY-ty);
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
+    if(dx<0 && window.__pipeAdvance && window.__pipeAdvance()) return;
+    go(idx+(dx<0?1:-1));
+  }
+},{passive:true});
+
+go(0);
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script type="module">
+let motion;
+try {
+  motion = await import('./assets/motion.min.js');
+} catch(e1) {
+  try {
+    motion = await import('https://cdn.jsdelivr.net/npm/motion@11.11.17/+esm');
+  } catch(e2) {
+    console.warn('[motion] local + CDN both failed, disabling animations', e1, e2);
+    document.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='1';el.style.transform='none'});
+    document.querySelectorAll('[data-animate="pipeline"] [data-anim]').forEach(el=>el.style.opacity='1');
+  }
+}
+
+if(motion){
+  const { animate, stagger } = motion;
+  document.body.classList.add('motion-ready');
+  const EASE = [.22, 1, .36, 1];
+  const slides = [...document.querySelectorAll('.slide')];
+  let pipeStep = -1;
+  let lastIdx = -1;
+
+  function resetAnims(slide){
+    slide.querySelectorAll('[data-anim]').forEach(el=>{
+      el.style.opacity='';
+      el.style.transform='';
+    });
+  }
+
+  function revealStatic(slide){
+    resetAnims(slide);
+    document.getAnimations?.().forEach(a=>a.cancel());
+    slide.querySelectorAll('[data-anim]').forEach(el=>{
+      el.style.opacity='1';
+      el.style.transform='none';
+    });
+  }
+
+  function playSlide(i){
+    const slide = slides[i];
+    if(!slide) return;
+    lastIdx = i;
+    const recipe = slide.dataset.animate || (slide.classList.contains('hero') ? 'hero' : 'cascade');
+
+    if(window.__lowPowerMode){
+      revealStatic(slide);
+      return;
+    }
+
+    if(recipe === 'pipeline'){
+      pipeStep = -1;
+      slide.querySelectorAll('[data-anim]').forEach(el=>{
+        el.style.opacity='0.15';
+        el.style.transform='none';
+      });
+      return;
+    }
+
+    resetAnims(slide);
+    const all = [...slide.querySelectorAll('[data-anim]')];
+    if(!all.length) return;
+
+    if(recipe === 'directional'){
+      const lefts  = all.filter(el=>el.dataset.anim==='left');
+      const divs   = all.filter(el=>el.dataset.anim==='divider');
+      const rights = all.filter(el=>el.dataset.anim==='right');
+      const others = all.filter(el=>!['left','right','divider'].includes(el.dataset.anim));
+      if(others.length) animate(others, {opacity:[0,1], y:[12,0]}, {duration:.6, delay:stagger(.1, {start:.15}), easing:EASE});
+      if(lefts.length)  animate(lefts,  {opacity:[0,1], x:[-24,0]}, {duration:.8, delay:.35, easing:EASE});
+      if(divs.length)   animate(divs,   {opacity:[0,.25]},          {duration:.5, delay:.9});
+      if(rights.length) animate(rights, {opacity:[0,1], x:[24,0]},  {duration:.8, delay:1.0, easing:EASE});
+      return;
+    }
+
+    if(recipe === 'quote'){
+      const lines = all.filter(el=>el.dataset.anim==='line');
+      const others = all.filter(el=>el.dataset.anim!=='line');
+      if(others.length) animate(others, {opacity:[0,1], y:[8,0]},    {duration:.6, delay:stagger(.12, {start:.2}), easing:EASE});
+      if(lines.length)  animate(lines,  {opacity:[.35,1], y:[10,0]}, {duration:.8, delay:stagger(.55, {start:.5}), easing:EASE});
+      return;
+    }
+
+    if(recipe === 'hero'){
+      animate(all, {opacity:[0,1], y:[14,0]}, {duration:.9, delay:stagger(.16, {start:.2}), easing:EASE});
+      return;
+    }
+
+    animate(all, {opacity:[0,1], y:[16,0]}, {duration:.75, delay:stagger(.1, {start:.15}), easing:EASE});
+  }
+
+  function pipeAdvance(){
+    if(window.__lowPowerMode) return false;
+    const slide = slides[lastIdx];
+    if(!slide || slide.dataset.animate !== 'pipeline') return false;
+    const steps  = [...slide.querySelectorAll('[data-anim="step"]')];
+    const arrows = [...slide.querySelectorAll('[data-anim="arrow"]')];
+    if(pipeStep >= steps.length - 1) return false;
+    pipeStep++;
+    animate(steps[pipeStep], {opacity:[0.15,1], y:[8,0]}, {duration:.5, easing:EASE});
+    if(pipeStep > 0 && arrows[pipeStep-1]){
+      animate(arrows[pipeStep-1], {opacity:[0.15,.7]}, {duration:.3, delay:.15});
+    }
+    return true;
+  }
+
+  window.__playSlide = playSlide;
+  window.__pipeAdvance = pipeAdvance;
+  playSlide(0);
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+const W=window.innerWidth,H=window.innerHeight;
+const scenes={dark:null,light:null};
+
+function buildScene(isLight){
+  const s=new THREE.Scene();
+  const c=new THREE.OrthographicCamera(-W/2,W/2,H/2,-H/2,.1,10);
+  c.position.z=1;
+  const r=new THREE.WebGLRenderer({alpha:true,antialias:false});
+  r.setSize(W,H);r.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+  const g=new THREE.PlaneGeometry(W,H);
+  const u={time:{value:0},resolution:{value:new THREE.Vector2(W,H)},accent:{value:new THREE.Color(isLight?'#f1f3f5':'#0a1f3d')}};
+  const frag=isLight?
+    'precision highp float;uniform vec2 resolution;uniform float time;varying vec2 vUv;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}void main(){vec2 uv=vUv;float n=noise(uv*4.+time*.03)*.04+.98;gl_FragColor=vec4(vec3(n),1.0);}':
+    'precision highp float;uniform vec2 resolution;uniform float time;varying vec2 vUv;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}void main(){vec2 uv=vUv;float n=noise(uv*4.+time*.03)*.04+.04;gl_FragColor=vec4(0.04,0.12,0.24,n);}';
+  const mat=new THREE.ShaderMaterial({uniforms:u,vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position,1.0);}',fragmentShader:frag,transparent:true});
+  const mesh=new THREE.Mesh(g,mat);s.add(mesh);
+  return {scene:s,renderer:r,material:mat};
+}
+
+const dark=buildScene(false);const light=buildScene(true);
+scenes.dark=dark;scenes.light=light;
+const cd=dark.renderer.domElement;cd.id='bg-dark';cd.className='bg';document.body.prepend(cd);
+const cl=light.renderer.domElement;cl.id='bg-light';cl.className='bg';document.body.prepend(cl);
+
+function animate(t){
+  requestAnimationFrame(animate);
+  dark.material.uniforms.time.value=t*.001;
+  light.material.uniforms.time.value=t*.001;
+  dark.renderer.render(dark.scene,new THREE.OrthographicCamera(-W/2,W/2,H/2,-H/2,.1,10));
+  light.renderer.render(light.scene,new THREE.OrthographicCamera(-W/2,W/2,H/2,-H/2,.1,10));
+}
+requestAnimationFrame(animate);
+window.addEventListener('resize',()=>{
+  const W2=window.innerWidth,H2=window.innerHeight;
+  dark.renderer.setSize(W2,H2);light.renderer.setSize(W2,H2);
+  dark.material.uniforms.resolution.value.set(W2,H2);
+  light.material.uniforms.resolution.value.set(W2,H2);
+});
+</script>
+</body>
+</html>

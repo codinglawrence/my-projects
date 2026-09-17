@@ -1,0 +1,70 @@
+classDiagram
+    class KeyProvider {
+        <<interface>>
+        +resolve(provider: str) str
+        +set(provider: str, key: str) void
+        +has(provider: str) bool
+    }
+    class LocalKeyProvider {
+        -_file_path: str
+        +resolve(provider) str
+        +set(provider, key) void
+        +has(provider) bool
+        -_from_keyring(provider) str
+        -_from_file(provider) str
+        -_to_file(provider, key) void
+    }
+    class TaskManager {
+        -_tasks: dict
+        +create(params) str
+        +get(task_id) Task
+        +update_progress(task_id, stage, processed, total, current_title) void
+        +finish(task_id, results, summary) void
+    }
+    class Task {
+        +id: str
+        +status: str
+        +stage: str
+        +processed: int
+        +total: int
+        +current_title: str
+        +results: list
+        +overall_summary: str
+    }
+    class SettingsStore {
+        -_path: str
+        +load() dict
+        +save(prefs: dict) void
+    }
+    class HistoryStore {
+        -_path: str
+        +list() list
+        +add(session: dict) void
+        +clear() void
+    }
+    class BilibiliUpCrawler {
+        +up_mid: str
+        +max_videos: int
+        +progress_callback: Callable
+        +run() void
+        +process_video(v: dict) dict
+        +generate_overall_summary() str
+    }
+    class FlaskApp {
+        +POST /api/extract
+        +GET  /api/task/&lt;id&gt;/status
+        +GET  /api/task/&lt;id&gt;/result
+        +GET/POST /api/settings
+        +GET/POST /api/history
+        +POST /api/export
+        +GET  /api/test
+    }
+
+    KeyProvider <|.. LocalKeyProvider
+    TaskManager *-- Task
+    FlaskApp ..> TaskManager : 创建/驱动后台任务
+    FlaskApp ..> KeyProvider : 解析密钥(设置&gt;默认)
+    FlaskApp ..> SettingsStore : 持久化偏好
+    FlaskApp ..> HistoryStore : 持久化历史
+    FlaskApp ..> BilibiliUpCrawler : 后台线程内构造并 run
+    BilibiliUpCrawler ..> TaskManager : progress_callback 上报

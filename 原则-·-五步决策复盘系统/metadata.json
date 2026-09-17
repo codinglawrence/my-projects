@@ -1,0 +1,6 @@
+{
+  "name": "原则 · 五步决策复盘系统",
+  "description": "基于瑞·达利欧《原则》五步循环决策法，系统化嵌入日常任务复盘，提供多端同步云端数据、行为模式AI诊断与未来决策指导洞察。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

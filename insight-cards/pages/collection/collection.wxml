@@ -1,0 +1,32 @@
+<!-- pages/collection/collection.wxml -->
+<!-- 收藏浏览：参考2「3D 旋转木马」适配为原生 swiper coverflow —— 居中卡放大、两侧露出 -->
+<!-- 卡面直接用鎏金卡牌图像(artBack)，笔记浮于底部，保留编辑 -->
+<view class="page">
+  <view wx:if="{{list.length === 0}}" class="empty">还没有收藏的卡。抽到有共鸣的卡时，点 ☆ 收藏它。</view>
+
+  <block wx:else>
+    <view class="ring-hint soft">滑动浏览你收藏的 {{list.length}} 张卡</view>
+    <swiper class="ring" previousMargin="80rpx" nextMargin="80rpx" bindchange="onSwipe" current="{{current}}">
+      <swiper-item wx:for="{{list}}" wx:key="id" class="ring-item">
+        <view class="ring-card {{index === current ? 'active' : ''}}">
+          <image class="rc-img" src="{{item.artBackBg}}" mode="aspectFill" />
+          <block wx:for="{{item.foilLayers}}" wx:key="z">
+            <view wx:if="{{!item.isImage}}" class="rc-foil-layer {{item.anim}}"
+                  style="background-image:{{item.gradient}};opacity:{{item.opacity}};mix-blend-mode:{{item.blend}};z-index:{{item.z}}"></view>
+            <image wx:else class="rc-foil-layer rc-holo-layer {{item.anim}}"
+                   src="{{item.src}}" mode="aspectFill"
+                   style="opacity:{{item.opacity}};z-index:{{item.z}}"></image>
+          </block>
+          <image class="rc-img-fg" src="{{item.artBackFg}}" mode="aspectFill" />
+          <view wx:if="{{item.note}}" class="rc-note">
+            <text class="note-label">笔记</text>
+            <text class="note-text">{{item.note}}</text>
+          </view>
+          <view class="rc-edit" catchtap="editNote" data-id="{{item.id}}">✎ 编辑笔记</view>
+        </view>
+      </swiper-item>
+    </swiper>
+  </block>
+
+  <view class="reset-all" bindtap="onResetAll">清除全部数据</view>
+</view>
